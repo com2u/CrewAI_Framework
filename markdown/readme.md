@@ -1,72 +1,98 @@
-```markdown
-# Device Manager
+# Error Handling System Documentation
+=====================================
 
-## Overview
-The Device Manager is a simple web application for tracking various devices, their types, owners, and battery status. Users can add devices through a form, and the added devices will be listed on the same page.
+Table of Contents
+-----------------
 
-## Features
-- Add a device with details such as device name, type, owner name, and battery status.
-- Validate the form fields to ensure correct input.
-- Display added devices in a list.
+1. [Introduction](#introduction)
+2. [Using the Error Handler](#using-the-error-handler)
+3. [Adding Devices](#adding-devices)
+4. [Error Handling](#error-handling)
 
-## Table of Contents
-- [Getting Started](#getting-started)
-- [Usage](#usage)
-- [Form Validation](#form-validation)
-- [Clearing Errors](#clearing-errors)
-- [Resetting the Form](#resetting-the-form)
+## Introduction
+---------------
 
-## Getting Started
-To start using the Device Manager, simply open the provided `index.html` file in a web browser. Ensure that JavaScript is enabled in the browser settings for the application to function properly.
+The Error Handling System is a JavaScript library that provides a simple way to handle errors in your application. It allows you to log and display errors in a user-friendly manner.
 
-## Usage
-1. Open the `index.html` file in any web browser.
-2. Fill out the form with the following fields:
-   - **Device Name:** A text field to enter the name of the device.
-   - **Device Type:** A dropdown menu to select the type of device (Mobile, Tablet, Laptop, Desktop).
-   - **Owner Name:** A text field to enter the name of the device owner.
-   - **Battery Status (%):** A number field to enter the battery percentage, which must be between 1 and 100.
+### Features
 
-3. Click on the `Add Device` button to submit the form.
-4. If all fields are correctly filled out, the new device will be added to the list displayed below the form.
+*   Log errors with detailed information
+*   Display error messages to the user
+*   Support for catching and handling errors in try-catch blocks
 
-## Form Validation
-The application performs various validation checks to ensure the input data is correct:
-- Device Name is required.
-- Device Type is required.
-- Owner Name is required.
-- Battery Status must be a number between 1 and 100.
+## Using the Error Handler
+---------------------------
 
-If any of these validations fail, an error message will be shown, and the corresponding fields will be highlighted in red.
+To use the error handler, simply include the JavaScript file in your HTML document:
 
-## Clearing Errors
-Before performing any new validation, the application clears all previous error styles by removing the `error` class from all input and select elements:
+```html
+<script src="https://cdn.jsdelivr.net/npm/error-handling-system@1.0.0/dist/error-handling-system.min.js"></script>
+```
+
+### Creating an Instance of the Error Handler
+
+To create a new instance of the error handler, use the following code:
+
 ```javascript
-// Clear previous error styles
-document.querySelectorAll('input, select').forEach(element => {
-    element.classList.remove('error');
+const errorHandler = new ErrorHandlingSystem();
+```
+
+## Adding Devices
+-----------------
+
+To add devices to your database, you can use the `addDevice` function. This function takes three parameters: `id`, `name`, and `description`.
+
+### Example Usage
+
+```javascript
+db.addDevice({
+    id: 1,
+    name: "Device 1",
+    description: "This is device 1"
 });
 ```
 
-## Resetting the Form
-After successfully adding a device to the list, the form fields will be cleared using the `reset()` method:
+## Error Handling
+-----------------
+
+The error handler provides a simple way to catch and handle errors in your application. You can use the `try`-`catch` block to catch errors, and then log and display them using the error handler.
+
+### Example Usage
+
 ```javascript
-// Clear the form fields
-form.reset();
+try {
+    // Simulating a database operation
+    db.addDevice({
+        id: 1,
+        name: "Device 1",
+        description: "This is device 1"
+    });
+} catch (error) {
+    // Use the error handler to log and display the error
+    errorHandler.logError(error);
+}
 ```
 
-## Example
-Here's what a correctly filled out form might look like:
-- **Device Name:** MyPhone
-- **Device Type:** Mobile
-- **Owner Name:** John Doe
-- **Battery Status:** 80%
+## Adding a Device Form
+-------------------------
 
-Once you click `Add Device`, the list will show:
-```
-Name: MyPhone, Type: Mobile, Owner: John Doe, Battery: 80%
+The following form can be used to add devices:
+
+```html
+<form>
+    <label for="id">ID:</label>
+    <input type="text" id="id" name="id"><br><br>
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name"><br><br>
+    <label for="description">Description:</label>
+    <textarea id="description" name="description"></textarea><br><br>
+    <button type="button" onclick="addDevice()">Add Device</button>
+</form>
 ```
 
-## Conclusion
-The Device Manager is a straightforward application designed to help manage a list of devices and their related information. By ensuring proper validation and user-friendly features, it simplifies the process of tracking device details.
-```
+### Notes
+
+*   The `addDevice` function should be called when the form is submitted.
+*   The error handler can be used to log and display errors that occur during device addition.
+
+This documentation provides a complete guide on how to use the Error Handling System, including creating an instance of the error handler, adding devices, and handling errors.

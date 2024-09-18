@@ -3,7 +3,7 @@ from crewai import Agent, Task, Crew, Process
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_community.llms import Ollama
-from llama_index.llms.openrouter import OpenRouter
+#from llama_index.llms.openrouter import OpenRouter
 
 print("## Starting CrewAI Framwork")
 load_dotenv()
@@ -25,20 +25,20 @@ os.environ["OPENAI_MODEL_NAME"] = os.getenv("OPENAI_MODEL_NAME")
 #    model="openai/o1-preview",
 #)
 
-llama31 = ChatOpenAI(
-  model="openai/o1-preview",
-  openai_api_key = os.getenv("OPENROUTER_API_KEY"),
-  openai_api_base = 'https://openrouter.ai/api/v1',
-  default_headers = {
-    "HTTP-Referer": "https://www.ai-server.org/",
-    "X-Title": "My SCRUM Crew"
-  },
-  temperature=0.3,
-  streaming=True
-)
+#llama31 = ChatOpenAI(
+#  model="openai/o1-preview",
+#  openai_api_key = os.getenv("OPENROUTER_API_KEY"),
+#  openai_api_base = 'https://openrouter.ai/api/v1',
+#  default_headers = {
+#    "HTTP-Referer": "https://www.ai-server.org/",
+#    "X-Title": "My SCRUM Crew"
+#  },
+#  temperature=0.3,
+#  streaming=True
+#)
 
-# llama31 = Ollama(model="llama3.1:latest", base_url="http://100.126.56.111:11434/v1")
-# codestral = Ollama(model="codestral:latest", base_url="http://100.126.56.111:11434/v1")
+llama31 = Ollama(model="llama3.1", base_url="http://100.126.56.111:11434")
+codestral = Ollama(model="codestral:latest", base_url="http://100.126.56.111:11434")
 # llama31 = Ollama(model="llama3.1:latest", base_url="http://100.126.56.111:3000/v1")
 # codestral = Ollama(model="codestral:latest", base_url="http://100.126.56.111:3000/v1")
 # llm = ChatOpenAI(model = "crewai-llama3", base_url = "http://100.126.56.111:11434/v1")
@@ -73,7 +73,7 @@ codeing_agent = Agent(
     goal="From the manager you get the list of tasks. Start with the first task to solve it. You will create the HTML web page with all the needed components. You will output the needed sourcecode",
     backstory="You are professional web developer for HTML, JS, and CSS",
     #llm=ChatOpenAI(model_name="gpt-4o", temperature=0.3),
-    llm=llama31,
+    llm=codestral,
     allow_delegation=False,
     #allow_code_execution=True,
     verbose=True
