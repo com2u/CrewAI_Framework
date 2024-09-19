@@ -1,45 +1,106 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Improved Frontend</title>
+    <title>Device Management</title>
     <style>
-        .error {
-            border: 1px solid red;
+        body {
+            font-family: Arial, sans-serif;
         }
-
-        .error-message {
-            color: red;
-            font-size: 0.8rem;
-            margin-top: 0.25rem;
+        
+        #device-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .device {
+            margin-bottom: 10px;
+        }
+        
+        .device-name {
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <label for="battery-status" title="Battery status of the device">Battery Status:</label>
-    <input type="range" id="battery-status" name="battery-status" min="0" max="100" required aria-describedby="battery-status-error" />
-    <div id="battery-status-error" class="error-message"></div>
-
+    <h1>Device Management</h1>
+    <button id="add-device-btn">Add Device</button>
+    <ul id="device-list"></ul>
+    
     <script>
-        document.getElementById("battery-status").addEventListener("change", function (event) {
-            const batteryStatusInput = document.getElementById("battery-status");
-            const batteryStatusError = document.getElementById("battery-status-error");
-
-            if (!validateBatteryStatus(event.target.value)) {
-                batteryStatusError.innerText = "Invalid battery status. Please enter a value between 0 and 100.";
-                batteryStatusInput.classList.add("error");
-            } else {
-                batteryStatusError.innerText = "";
-                batteryStatusInput.classList.remove("error");
+        // Add a new device
+        function addDevice(name, type, owner) {
+            const devices = getDevices();
+            const deviceId = devices.length + 1;
+            devices.push({ id: deviceId, name, type, owner, batteryStatus: 100 });
+            localStorage.setItem('devices', JSON.stringify(devices));
+            updateDeviceList();
+        }
+        
+        // Remove a device
+        function removeDevice(id) {
+            const devices = getDevices();
+            devices.splice(devices.findIndex(device => device.id === id), 1);
+            localStorage.setItem('devices', JSON.stringify(devices));
+            updateDeviceList();
+        }
+        
+        // Update all device settings or delete existing devices
+        function updateAllDevices(settings) {
+            const devices = getDevices();
+            devices.forEach(device => Object.assign(device, settings));
+            localStorage.setItem('devices', JSON.stringify(devices));
+            updateDeviceList();
+        }
+        
+        // Get stored devices from Local Storage
+        function getDevices() {
+            return JSON.parse(localStorage.getItem('devices')) || [];
+        }
+        
+        // Update device list dynamically
+        function updateDeviceList() {
+            const deviceList = document.getElementById('device-list');
+            deviceList.innerHTML = '';
+            
+            const devices = getDevices();
+            devices.forEach(device => {
+                const deviceElement = document.createElement('li');
+                deviceElement.classList.add('device');
+                
+                const deviceNameElement = document.createElement('span');
+                deviceNameElement.classList.add('device-name');
+                deviceNameElement.textContent = device.name;
+                deviceElement.appendChild(deviceNameElement);
+                
+                const batteryStatusElement = document.createElement('span');
+                batteryStatusElement.textContent = `Battery Status: ${device.batteryStatus}%`;
+                deviceElement.appendChild(batteryStatusElement);
+                
+                const removeButtonElement = document.createElement('button');
+                removeButtonElement.textContent = 'Remove';
+                removeButtonElement.onclick = () => removeDevice(device.id);
+                deviceElement.appendChild(removeButtonElement);
+                
+                deviceList.appendChild(deviceElement);
+            });
+        }
+        
+        // Initialize event listener for add device button
+        const addDeviceButton = document.getElementById('add-device-btn');
+        addDeviceButton.addEventListener('click', () => {
+            const nameInput = prompt('Enter device name:');
+            const typeInput = prompt('Enter device type:');
+            const ownerInput = prompt('Enter device owner:');
+            
+            if (nameInput && typeInput && ownerInput) {
+                addDevice(nameInput, typeInput, ownerInput);
             }
         });
-
-        function validateBatteryStatus(value) {
-            // Implement your validation logic here
-            return value >= 0 && value <= 100;
-        }
+        
+        updateDeviceList();
     </script>
 </body>
 </html>

@@ -1,232 +1,123 @@
+**
+
+Here is the corrected HTML template with JavaScript:
+
+```html
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Device Management App</title>
-    <style>
-        /* CSS styles */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        h1, h2 {
-            text-align: center;
-        }
-        form, table {
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto 20px;
-        }
-        form input, form select {
-            padding: 8px;
-            margin-bottom: 10px;
-            width: calc(100% - 20px);
-        }
-        form button {
-            padding: 10px;
-            width: 100%;
-        }
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-        table th, table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-        }
-        table td button {
-            margin: 0 5px;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
 </head>
 <body>
-    <h1>Device Management App</h1>
-
-    <form id="deviceForm">
-        <h2>Add a New Device</h2>
-        <input type="text" id="deviceName" placeholder="Device Name" required />
-        <select id="deviceType" required>
-            <option value="">Select Device Type</option>
-            <option value="Smartphone">Smartphone</option>
-            <option value="Tablet">Tablet</option>
-            <option value="Camera">Camera</option>
-        </select>
-        <input type="text" id="ownerName" placeholder="Owner Name" required />
-        <input type="number" id="batteryStatus" placeholder="Battery Status (0-100%)" min="0" max="100" required />
-        <button type="submit">Add Device</button>
+    <!-- Add a device form -->
+    <form id="add-device-form">
+        <label for="device-name">Device Name:</label>
+        <input type="text" id="device-name"><br><br>
+        <label for="device-type">Type:</label>
+        <select id="device-type">
+            <option value="CPU">CPU</option>
+            <option value="GPU">GPU</option>
+            <option value="RAM">RAM</option>
+            <option value="Storage">Storage</option>
+        </select><br><br>
+        <label for="owner-name">Owner Name:</label>
+        <input type="text" id="owner-name"><br><br>
+        <button id="create-device-btn" type="submit">Create Device</button>
     </form>
 
-    <table id="deviceTable">
-        <thead>
-            <tr>
-                <th>Device Name</th>
-                <th>Device Type</th>
-                <th>Owner Name</th>
-                <th>Battery Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Devices will be listed here -->
-        </tbody>
-    </table>
+    <!-- Remove device button -->
+    <button id="remove-device-btn" style="display: none;">Remove Device</button>
 
+    <!-- Update device form -->
+    <form id="update-device-form" style="display: none;">
+        <label for="device-id">Device ID:</label>
+        <input type="text" id="device-id"><br><br>
+        <label for="new-name">New Name:</label>
+        <input type="text" id="new-name"><br><br>
+        <label for="new-type">New Type:</label>
+        <select id="new-type">
+            <option value="CPU">CPU</option>
+            <option value="GPU">GPU</option>
+            <option value="RAM">RAM</option>
+            <option value="Storage">Storage</option>
+        </select><br><br>
+        <label for="new-owner">New Owner:</label>
+        <input type="text" id="new-owner"><br><br>
+        <button id="update-device-btn" type="submit">Update Device</button>
+    </form>
+
+    <!-- Script -->
     <script>
-        // JavaScript code
-        let devices = [];
+        // Create buttons to add, remove and update a device
+        const addButton = document.getElementById('create-device-btn');
+        const removeButton = document.getElementById('remove-device-btn');
+        const updateButton = document.getElementById('update-device-btn');
 
-        // Load devices from localStorage
-        if (localStorage.getItem('devices')) {
-            devices = JSON.parse(localStorage.getItem('devices'));
-        }
-
-        function saveDevices() {
-            localStorage.setItem('devices', JSON.stringify(devices));
-        }
-
-        function renderDevices() {
-            const tbody = document.querySelector('#deviceTable tbody');
-            tbody.innerHTML = '';
-            devices.forEach((device, index) => {
-                const tr = document.createElement('tr');
-
-                const tdName = document.createElement('td');
-                tdName.textContent = device.deviceName;
-                tr.appendChild(tdName);
-
-                const tdType = document.createElement('td');
-                tdType.textContent = device.deviceType;
-                tr.appendChild(tdType);
-
-                const tdOwner = document.createElement('td');
-                tdOwner.textContent = device.ownerName;
-                tr.appendChild(tdOwner);
-
-                const tdBattery = document.createElement('td');
-                tdBattery.textContent = device.batteryStatus + '%';
-                tr.appendChild(tdBattery);
-
-                const tdActions = document.createElement('td');
-
-                const btnUpdate = document.createElement('button');
-                btnUpdate.textContent = 'Update';
-                btnUpdate.addEventListener('click', () => {
-                    updateDevice(index);
-                });
-                tdActions.appendChild(btnUpdate);
-
-                const btnDelete = document.createElement('button');
-                btnDelete.textContent = 'Delete';
-                btnDelete.addEventListener('click', () => {
-                    deleteDevice(index);
-                });
-                tdActions.appendChild(btnDelete);
-
-                tr.appendChild(tdActions);
-
-                tbody.appendChild(tr);
+        if (addButton) {
+            addButton.addEventListener('click', () => {
+                showAddForm();
             });
         }
 
-        function addDevice(device) {
-            devices.push(device);
-            saveDevices();
-            renderDevices();
-            startBatteryDrain(devices.length - 1);
+        if (removeButton) {
+            removeButton.addEventListener('click', () => {
+                removeDevice();
+            });
         }
 
-        function updateDevice(index) {
-            const device = devices[index];
-            const newDeviceName = prompt('Enter new Device Name:', device.deviceName);
-            if (newDeviceName !== null && newDeviceName.trim() !== '') {
-                device.deviceName = newDeviceName.trim();
-            }
+        if (updateButton) {
+            updateButton.addEventListener('click', () => {
+                showUpdateForm();
+            });
+        }
+    </script>
 
-            const newDeviceType = prompt('Enter new Device Type (Smartphone, Tablet, Camera):', device.deviceType);
-            if (newDeviceType !== null && ['Smartphone', 'Tablet', 'Camera'].includes(newDeviceType)) {
-                device.deviceType = newDeviceType;
-            }
+    <script>
+        // Function to show add form
+        function showAddForm() {
+            const addForm = document.getElementById('add-device-form');
 
-            const newOwnerName = prompt('Enter new Owner Name:', device.ownerName);
-            if (newOwnerName !== null && newOwnerName.trim() !== '') {
-                device.ownerName = newOwnerName.trim();
-            }
+            if (addForm) {
+                addForm.style.display = 'block';
 
-            const newBatteryStatus = prompt('Enter new Battery Status (0-100):', device.batteryStatus);
-            if (newBatteryStatus !== null) {
-                let batteryStatus = parseInt(newBatteryStatus);
-                if (!isNaN(batteryStatus) && batteryStatus >= 0 && batteryStatus <= 100) {
-                    device.batteryStatus = batteryStatus;
+                // Get button elements
+                const createDeviceButton = document.querySelector('#create-device-btn');
+                const removeDeviceButton = document.querySelector('#remove-device-btn');
+
+                if (createDeviceButton && removeDeviceButton) {
+                    createDeviceButton.style.display = 'none';
+                    removeDeviceButton.style.display = 'block';
                 }
             }
-
-            saveDevices();
-            renderDevices();
         }
 
-        function deleteDevice(index) {
-            clearInterval(devices[index].batteryInterval);
-            devices.splice(index, 1);
-            saveDevices();
-            renderDevices();
-        }
+        // Function to show update form
+        function showUpdateForm() {
+            const updateForm = document.getElementById('update-device-form');
 
-        function startBatteryDrain(index) {
-            if (index >= devices.length) return;
-            const device = devices[index];
-            device.batteryInterval = setInterval(() => {
-                if (device.batteryStatus > 0) {
-                    device.batteryStatus -= 1;
-                    saveDevices();
-                    renderDevices();
-                } else {
-                    clearInterval(device.batteryInterval);
+            if (updateForm) {
+                updateForm.style.display = 'block';
+
+                // Get button elements
+                const createDeviceButton = document.querySelector('#create-device-btn');
+                const removeDeviceButton = document.querySelector('#remove-device-btn');
+
+                if (createDeviceButton && removeDeviceButton) {
+                    createDeviceButton.style.display = 'block';
+                    removeDeviceButton.style.display = 'none';
                 }
-            }, 1000);
+            }
         }
 
-        // Start battery drain for all devices
-        devices.forEach((device, index) => {
-            if (device.batteryStatus > 0) {
-                startBatteryDrain(index);
-            }
-        });
-
-        document.getElementById('deviceForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-
-            const deviceName = document.getElementById('deviceName').value.trim();
-            const deviceType = document.getElementById('deviceType').value;
-            const ownerName = document.getElementById('ownerName').value.trim();
-            const batteryStatus = parseInt(document.getElementById('batteryStatus').value);
-
-            if (
-                !deviceName ||
-                !deviceType ||
-                !ownerName ||
-                isNaN(batteryStatus) ||
-                batteryStatus < 0 ||
-                batteryStatus > 100
-            ) {
-                alert('Please fill out all fields correctly.');
-                return;
-            }
-
-            const device = {
-                deviceName,
-                deviceType,
-                ownerName,
-                batteryStatus,
-            };
-
-            addDevice(device);
-
-            // Reset the form
-            document.getElementById('deviceForm').reset();
-        });
-
-        // Initial render
-        renderDevices();
+        // Function to remove device
+        function removeDevice() {
+            console.log('Removing device...');
+        }
     </script>
 </body>
 </html>
+```
+
+Please let me know if this is what you were looking for!

@@ -48,7 +48,7 @@ developmentProject="""Create a web page for a device management app. The page sh
          Add the possibility to update all device settings or delete existing devices.
          Add the possibility to create new devices with a screen to input the data.
          When a device was added decrease the per device given Battery Status every second by 1% until it reaches 0%.
-         Store the device data be be persistent.
+         Store the device data in the local browser store.
          Your solution should be one HTML page with all components, styles and JavaScript code in this file"""
 
 
@@ -71,7 +71,7 @@ codeing_agent = Agent(
     llm=llama31,
     allow_delegation=False,
     #allow_code_execution=True,
-    tools=[requirement],
+    #tools=[requirement],
     verbose=True
 )
 
@@ -82,7 +82,7 @@ codeing_agent2 = Agent(
     #llm=ChatOpenAI(model_name="gpt-4o", temperature=0.3),
     llm=llama31,
     allow_delegation=False,
-    tools=[requirement],
+    #tools=[requirement],
     #allow_code_execution=True,
     verbose=True
 )
@@ -94,7 +94,7 @@ codeing_agent3 = Agent(
     #llm=ChatOpenAI(model_name="gpt-4o", temperature=0.3),
     llm=llama31,
     allow_delegation=False,
-    tools=[requirement],
+    #tools=[requirement],
     #allow_code_execution=True,
     verbose=True
 )
@@ -106,7 +106,7 @@ codeing_agent4 = Agent(
     #llm=ChatOpenAI(model_name="gpt-4o", temperature=0.3),
     llm=llama31,
     allow_delegation=False,
-    tools=[requirement],
+    #tools=[requirement],
     #allow_code_execution=True,
     verbose=True
 )
@@ -118,7 +118,7 @@ codereview_agent = Agent(
     """,
     llm=llama31,
     allow_delegation=False,
-    tools=[requirement],
+    #tools=[requirement],
     verbose=True
 )
 
@@ -128,7 +128,7 @@ uiux_agent = Agent(
     backstory="""You are a professional designer with focus on UI/UX. You think about user interaction and a clean logic and consitent frontend""",
     llm=llama31,
     allow_delegation=False,
-    tools=[requirement],
+    #tools=[requirement],
     verbose=True
 )
 
@@ -138,7 +138,7 @@ documentation_agent = Agent(
     backstory="""You are an expert for professional software documentation. You think about structure of the documentation. All documentation should be logic, clean and easy to read. """,
     llm=llama31,
     allow_delegation=False,
-    tools=[requirement],
+    #tools=[requirement],
     verbose=True
 )
 
@@ -148,7 +148,7 @@ test_agent = Agent(
     backstory="""You are an professional tester by reading the requirements and comparing them with the implementation """,
     llm=llama31,
     allow_delegation=False,
-    tools=[requirement],
+    #tools=[requirement],
     verbose=True
 )
 
@@ -177,7 +177,7 @@ managementTask11 = Task(
 codingTask11 = Task(
     description=f"Start implementing the second task from task list created by the manager",
     expected_output="Just provide the full code without any explanation as index.html to be opened with a browser. ONLY SOURCE CODE NO ADDITIONAL MARKS, TEXT OR COMMENTS",
-    output_file="public/index1.html",
+    output_file="public/index11.html",
     context=[managementTask11],
     agent=codeing_agent
 )
@@ -185,7 +185,7 @@ codingTask11 = Task(
 reviewTask1 = Task(
     description="do a proper code review from the coding agent results and share your suggestion to improve the code",
     expected_output="""Explain one most important suggestion to improve the code in markdown format""",
-    output_file="markdown/review.md",
+    output_file="markdown/review1.md",
     context=[codingTask11],
     agent=codereview_agent
 )
@@ -202,7 +202,7 @@ codingTask2 = Task(
 designerTask1 = Task(
     description="Think about optimising the design. Provide one suggestion to improve design, layout or usability of the frontend",
     expected_output="""Explain one most important suggestion to improve the code in markdown format""",
-    output_file="markdown/uiux.md",
+    output_file="markdown/uiux1.md",
     context=[codingTask2],
     agent=uiux_agent
 )
@@ -218,15 +218,15 @@ codingTask3 = Task(
 reviewTask2 = Task(
     description="do a proper code review from the coding agent results and share your suggestion to improve the code",
     expected_output="""Explain one most important suggestion to improve the code in markdown format""",
-    output_file="markdown/review.md",
+    output_file="markdown/review2.md",
     context=[codingTask3],
     agent=codereview_agent
 )
 
 codingTask4 = Task(
-    description=f"Improve the existing implementation und provide the updated HTML page with all needed components. Always provide the full complete code and no fragments.",
+    description=f"Improve the existing implementation und provide the updated HTML page with all needed components. Always provide the full complete code and no fragments. Keep the requirements in mind:"+developmentProject,
     expected_output="Just provide the full code without any explanation as index.html to be opened with a browser. ONLY SOURCE CODE NO ADDITIONAL MARKS, TEXT OR COMMENTS",
-    output_file="public/index5.html",
+    output_file="public/index4.html",
     context=[reviewTask2],
     agent=codeing_agent2
 )
@@ -235,15 +235,15 @@ codingTask4 = Task(
 designerTask2 = Task(
     description="Think about optimising the design. Provide one suggestion to improve design, layout or usability of the frontend",
     expected_output="""Explain one most important suggestion to improve the code in markdown format""",
-    output_file="markdown/uiux.md",
+    output_file="markdown/uiux2.md",
     context=[codingTask4],
     agent=uiux_agent
 )
 
 codingTask5 = Task(
-    description=f"Improve the existing implementation und provide the updated HTML page with all needed components. Always provide the full complete code and no fragments.",
+    description=f"Improve the existing implementation und provide the updated HTML page with all needed components. Always provide the full complete code and no fragments. And double check the requirments:"+developmentProject,
     expected_output="Just provide the full code without any explanation as index.html to be opened with a browser. ONLY SOURCE CODE NO ADDITIONAL MARKS, TEXT OR COMMENTS",
-    output_file="public/index6.html",
+    output_file="public/index5.html",
     context=[designerTask2],
     agent=codeing_agent3
 )
@@ -251,15 +251,15 @@ codingTask5 = Task(
 reviewTask3 = Task(
     description="do a proper code review from the coding agent results and share your suggestion to improve the code",
     expected_output="""Explain one most important suggestion to improve the code in markdown format""",
-    output_file="markdown/review.md",
+    output_file="markdown/review3.md",
     context=[codingTask5],
     agent=codereview_agent
 )
 
 codingTask6 = Task(
-    description=f"Improve the existing implementation und provide the updated HTML page with all needed components. Always provide the full complete code and no fragments.",
+    description=f"Improve the existing implementation und provide the updated HTML page with all needed components. Always provide the full complete code and no fragments. Check the requirements:"+developmentProject,
     expected_output="Just provide the full code without any explanation as index.html to be opened with a browser. ONLY SOURCE CODE NO ADDITIONAL MARKS, TEXT OR COMMENTS",
-    output_file="public/index.html",
+    output_file="public/index6.html",
     context=[reviewTask3],
     agent=codeing_agent4
 )

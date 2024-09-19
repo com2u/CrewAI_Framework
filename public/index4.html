@@ -1,0 +1,144 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        
+        #device-table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        
+        #device-table th, #device-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Device Management</h1>
+    
+    <form id="add-device-form">
+        <label for="device-name">Name:</label>
+        <input type="text" id="device-name" name="name"><br><br>
+        <label for="device-type">Type:</label>
+        <select id="device-type" name="type">
+            <option value="Phone">Phone</option>
+            <option value="Laptop">Laptop</option>
+            <option value="Tablet">Tablet</option>
+        </select><br><br>
+        <label for="owner-name">Owner:</label>
+        <input type="text" id="owner-name" name="owner"><br><br>
+        <button type="submit" onclick="addDevice()">Add Device</button>
+    </form>
+    
+    <h2>Device List:</h2>
+    <table id="device-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Owner</th>
+                <th>Battery Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="device-list"></tbody>
+    </table>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sql.js@0.1.52/dist/sql.min.js"></script>
+    <script>
+        // Create a database connection
+        const db = new SQL.Database();
+        
+        // Create a table to store device data
+        db.run(`
+            CREATE TABLE devices (
+                id INTEGER PRIMARY KEY,
+                name TEXT NOT NULL,
+                type TEXT NOT NULL,
+                owner TEXT NOT NULL,
+                battery_status REAL NOT NULL
+            );
+        `);
+        
+        function addDevice() {
+            const name = document.getElementById('device-name').value;
+            const type = document.getElementById('device-type').value;
+            const owner = document.getElementById('owner-name').value;
+
+            db.run(`
+                INSERT INTO devices (name, type, owner, battery_status)
+                VALUES (?, ?, ?, ?);
+            `, [name, type, owner, '100'], function(err) {
+                if (err) {
+                    console.error(err);
+                } else {
+                    updateDeviceTable();
+                }
+            });
+        }
+        
+        function removeDevice(device) {
+            db.run(`
+                DELETE FROM devices WHERE name = ?;
+            `, [device.name], function(err) {
+                if (err) {
+                    console.error(err);
+                } else {
+                    updateDeviceTable();
+                }
+            });
+        }
+        
+        function updateDevice(device) {
+            const newBatteryStatus = parseInt(device.battery_status) - 1;
+            db.run(`
+                UPDATE devices SET battery_status = ? WHERE name = ?;
+            `, [newBatteryStatus.toString(), device.name], function(err) {
+                if (err) {
+                    console.error(err);
+                } else {
+                    updateDeviceTable();
+                }
+            });
+        }
+        
+        function updateDeviceTable() {
+            const deviceList = document.getElementById('device-list');
+            db.all("SELECT * FROM devices", function(err, rows) {
+                if (err) {
+                    console.error(err);
+                } else {
+                    let html = '';
+                    rows.forEach(row => {
+                        html += `
+                            <tr>
+                                <td>${row.name}</td>
+                                <td>${row.type}</td>
+                                <td>${row.owner}</td>
+                                <td>${row.battery_status}%</td>
+                                <td>
+                                    <button onclick="removeDevice({name: '${row.name}', battery_status: ${row.battery_status}})">Remove</button>
+                                    <button onclick="updateDevice({name: '${row.name}', battery_status: ${row.battery_status}})">Update</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    deviceList.innerHTML = html;
+                }
+            });
+        }
+        
+        updateDeviceTable();
+    </script>
+</body>
+</html>
+```
