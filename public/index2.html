@@ -1,50 +1,45 @@
-```html
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Device Management Application</title>
+    <title>Improved Frontend</title>
+    <style>
+        .error {
+            border: 1px solid red;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+        }
+    </style>
 </head>
 <body>
-    <!-- Database error handling implementation -->
+    <label for="battery-status" title="Battery status of the device">Battery Status:</label>
+    <input type="range" id="battery-status" name="battery-status" min="0" max="100" required aria-describedby="battery-status-error" />
+    <div id="battery-status-error" class="error-message"></div>
+
     <script>
-        try {
-            // Simulating a database operation
-            db.addDevice({
-                id: 1,
-                name: "Device 1",
-                description: "This is device 1"
-            });
-        } catch (error) {
-            console.error("Database error:", error);
-            // Handle the error by displaying an error message to the user
-            document.getElementById("database-error").innerHTML = "An error occurred while adding a device.";
-        }
+        document.getElementById("battery-status").addEventListener("change", function (event) {
+            const batteryStatusInput = document.getElementById("battery-status");
+            const batteryStatusError = document.getElementById("battery-status-error");
 
-        try {
-            // Simulating another database operation
-            db.updateDevice({
-                id: 1,
-                name: "Device 1 Updated",
-                description: "This is device 1 updated"
-            });
-        } catch (error) {
-            console.error("Database error:", error);
-            document.getElementById("database-error").innerHTML = "An error occurred while updating a device.";
-        }
+            if (!validateBatteryStatus(event.target.value)) {
+                batteryStatusError.innerText = "Invalid battery status. Please enter a value between 0 and 100.";
+                batteryStatusInput.classList.add("error");
+            } else {
+                batteryStatusError.innerText = "";
+                batteryStatusInput.classList.remove("error");
+            }
+        });
 
-        try {
-            // Simulating another database operation
-            db.deleteDevice(1);
-        } catch (error) {
-            console.error("Database error:", error);
-            document.getElementById("database-error").innerHTML = "An error occurred while deleting a device.";
+        function validateBatteryStatus(value) {
+            // Implement your validation logic here
+            return value >= 0 && value <= 100;
         }
     </script>
-
-    <!-- Displaying the error message -->
-    <p id="database-error"></p>
 </body>
 </html>
-```

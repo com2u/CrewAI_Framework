@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Device Management</title>
+    <style>
+      /* Add your CSS styles here */
+    </style>
+  </head>
+  <body>
+    <h1>Device Management</h1>
+    <form id="device-form">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required />
+      <label for="type">Type:</label>
+      <input type="text" id="type" name="type" required />
+      <label for="owner">Owner:</label>
+      <input type="text" id="owner" name="owner" required />
+      <button type="submit">Add Device</button>
+    </form>
+    <div id="device-container"></div>
+    <script>
+      // Add your JavaScript code here
+      const devices = [
+        {
+          name: "Device 1",
+          type: "Smartphone",
+          owner: "John Doe",
+          batteryStatus: 100,
+        },
+      ];
+
+      function addDevice(device) {
+        if (!device.name || !device.type || !device.owner) {
+          console.error("Invalid device data");
+          return;
+        }
+        devices.push(device);
+        renderDevices();
+      }
+
+      function updateDevice(index, updatedDevice) {
+        if (index < 0 || index >= devices.length) {
+          console.error("Invalid device index");
+          return;
+        }
+        if (!updatedDevice.name || !updatedDevice.type || !updatedDevice.owner) {
+          console.error("Invalid updated device data");
+          return;
+        }
+        devices[index] = updatedDevice;
+        renderDevices();
+      }
+
+      function deleteDevice(index) {
+        if (index < 0 || index >= devices.length) {
+          console.error("Invalid device index");
+          return;
+        }
+        devices.splice(index, 1);
+        renderDevices();
+      }
+
+      function renderDevices() {
+        const deviceContainer = document.getElementById("device-container");
+        deviceContainer.innerHTML = "";
+
+        devices.forEach((device, index) => {
+          const deviceElement = createDeviceElement(device, index);
+          deviceContainer.appendChild(deviceElement);
+        });
+      }
+
+      function createDeviceElement(device, index) {
+        const deviceElement = document.createElement("div");
+        deviceElement.classList.add("device");
+        deviceElement.innerHTML = `
+          <h2>${device.name} (${device.type})</h2>
+          <p>Owner: ${device.owner}</p>
+          <p>Battery Status: ${device.batteryStatus}%</p>
+          <button onclick="deleteDevice(${index})">Delete Device</button>
+        `;
+        return deviceElement;
+      }
+
+      const deviceForm = document.getElementById("device-form");
+      deviceForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const name = deviceForm.name.value;
+        const type = deviceForm.type.value;
+        const owner = deviceForm.owner.value;
+        addDevice({ name, type, owner });
+        deviceForm.reset();
+      });
+
+      setInterval(() => {
+        devices.forEach((device) => {
+          if (device.batteryStatus > 0) {
+            device.batteryStatus--;
+          }
+        });
+        renderDevices();
+      }, 1000);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,152 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Management App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1, h2 {
+            text-align: center;
+        }
+
+        form {
+            margin-bottom: 2rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        input, select {
+            display: block;
+            width: 100%;
+            padding: 0.5rem;
+        }
+
+        button {
+            background-color: blue;
+            color: white;
+            border: none;
+            padding: 0.5rem;
+            cursor: pointer;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            border-bottom: 1px solid #ccc;
+            padding: 0.5rem 0;
+        }
+
+        .device-name {
+            font-weight: bold;
+        }
+
+        .device-type {
+            text-transform: capitalize;
+        }
+
+        .owner-name {
+            font-style: italic;
+        }
+
+        .battery-status {
+            width: 50%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Device Management App</h1>
+    <form id="device-form">
+        <input type="hidden" id="device-id">
+        <label for="device-name">Device Name:</label>
+        <input type="text" id="device-name" required>
+        <label for="device-type">Device Type:</label>
+        <select id="device-type" required>
+            <option value="Smartphone">Smartphone</option>
+            <option value="Tablet">Tablet</option>
+            <option value="Camera">Camera</option>
+        </select>
+        <label for="owner-name">Owner Name:</label>
+        <input type="text" id="owner-name" required>
+        <label for="battery-status">Battery Status:</label>
+        <input type="range" id="battery-status" min="0" max="100" value="100" required>
+        <button type="submit">Add Device</button>
+    </form>
+    <h2>Existing Devices</h2>
+    <ul id="devices-list"></ul>
+    <script>
+        class Device {
+            constructor(id, name, type, owner, status) {
+                this.id = id;
+                this.name = name;
+                this.type = type;
+                this.owner = owner;
+                this.status = status;
+            }
+        }
+
+        const devices = [];
+
+        function addDevice(name, type, owner, status) {
+            const id = devices.length + 1;
+            const newDevice = new Device(id, name, type, owner, status);
+            devices.push(newDevice);
+            renderDevices();
+        }
+
+        function updateDevice(id, name, type, owner, status) {
+            const device = devices.find(device => device.id === id);
+            if (device) {
+                device.name = name;
+                device.type = type;
+                device.owner = owner;
+                device.status = status;
+                renderDevices();
+            }
+        }
+
+        function deleteDevice(id) {
+            devices = devices.filter(device => device.id !== id);
+            renderDevices();
+        }
+
+        function renderDevices() {
+            const devicesList = document.getElementById("devices-list");
+            devicesList.innerHTML = "";
+
+            devices.forEach(device => {
+                const li = document.createElement("li");
+                li.innerHTML = `<span class="device-name">${device.name}</span> <span class="device-type">${device.type}</span> <span class="owner-name">${device.owner}</span> <span class="battery-status">${device.status}%</span> <button onclick="updateDevice(${device.id}, '${device.name}', '${device.type}', '${device.owner}', ${device.status - 1})">Decrease Battery</button> <button onclick="deleteDevice(${device.id})">Delete</button>`;
+                devicesList.appendChild(li);
+            });
+        }
+
+        document.getElementById("device-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const name = document.getElementById("device-name").value;
+            const type = document.getElementById("device-type").value;
+            const owner = document.getElementById("owner-name").value;
+            const status = document.getElementById("battery-status").value;
+            addDevice(name, type, owner, status);
+            document.getElementById("device-form").reset();
+        });
+
+        // Initialize the app with some sample data
+        addDevice("iPhone", "Smartphone", "John Doe", 80);
+        addDevice("iPad", "Tablet", "Jane Doe", 60);
+        addDevice("Camera X100", "Camera", "Alice", 90);
+    </script>
+</body>
+</html>

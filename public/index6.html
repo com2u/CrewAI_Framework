@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Device Management</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+      h1 {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+      form {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+      label {
+        text-align: right;
+      }
+      input,
+      button {
+        padding: 0.5rem;
+      }
+      #device-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+      }
+      .device {
+        padding: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      .device h2 {
+        margin-top: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Device Management</h1>
+    <form id="device-form">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required />
+      <label for="type">Type:</label>
+      <input type="text" id="type" name="type" required />
+      <label for="owner">Owner:</label>
+      <input type="text" id="owner" name="owner" required />
+      <button type="submit">Add Device</button>
+    </form>
+    <div id="device-container"></div>
+    <script>
+      // Add your JavaScript code here
+      const devices = [
+        {
+          name: "Device 1",
+          type: "Smartphone",
+          owner: "John Doe",
+          batteryStatus: 100,
+        },
+      ];
+
+      // ... rest of the JavaScript code
+    </script>
+  </body>
+</html>

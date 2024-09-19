@@ -1,71 +1,232 @@
-```html
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Error Handling System</title>
+    <title>Device Management App</title>
     <style>
+        /* CSS styles */
         body {
             font-family: Arial, sans-serif;
+            margin: 20px;
         }
-        
-        #database-error {
-            color: red;
+        h1, h2 {
+            text-align: center;
+        }
+        form, table {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto 20px;
+        }
+        form input, form select {
+            padding: 8px;
+            margin-bottom: 10px;
+            width: calc(100% - 20px);
+        }
+        form button {
+            padding: 10px;
+            width: 100%;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        table td button {
+            margin: 0 5px;
         }
     </style>
 </head>
 <body>
-    <h1>Error Handling System</h1>
-    
-    <!-- Create a dedicated error handler instance -->
-    <script src="https://cdn.jsdelivr.net/npm/error-handling-system@1.0.0/dist/error-handling-system.min.js"></script>
-    <script>
-        const errorHandler = new ErrorHandlingSystem();
-        
-        try {
-            // Simulating a database operation
-            db.addDevice({
-                id: 1,
-                name: "Device 1",
-                description: "This is device 1"
-            });
-        } catch (error) {
-            // Use the error handler to log and display the error
-            errorHandler.logError(error);
-            document.getElementById("database-error").innerHTML = "An error occurred while adding a device.";
-        }
-        
-        function addDevice() {
-            try {
-                const id = parseInt(document.getElementById("id").value);
-                const name = document.getElementById("name").value;
-                const description = document.getElementById("description").value;
-                
-                db.addDevice({
-                    id,
-                    name,
-                    description
-                });
-            } catch (error) {
-                errorHandler.logError(error);
-                document.getElementById("database-error").innerHTML = "An error occurred while adding a device.";
-            }
-        }
-    </script>
-    
-    <h2>Add Device</h2>
-    <form>
-        <label for="id">ID:</label>
-        <input type="text" id="id" name="id"><br><br>
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name"><br><br>
-        <label for="description">Description:</label>
-        <textarea id="description" name="description"></textarea><br><br>
-        <button type="button" onclick="addDevice()">Add Device</button>
+    <h1>Device Management App</h1>
+
+    <form id="deviceForm">
+        <h2>Add a New Device</h2>
+        <input type="text" id="deviceName" placeholder="Device Name" required />
+        <select id="deviceType" required>
+            <option value="">Select Device Type</option>
+            <option value="Smartphone">Smartphone</option>
+            <option value="Tablet">Tablet</option>
+            <option value="Camera">Camera</option>
+        </select>
+        <input type="text" id="ownerName" placeholder="Owner Name" required />
+        <input type="number" id="batteryStatus" placeholder="Battery Status (0-100%)" min="0" max="100" required />
+        <button type="submit">Add Device</button>
     </form>
-    
-    <div id="database-error"></div>
+
+    <table id="deviceTable">
+        <thead>
+            <tr>
+                <th>Device Name</th>
+                <th>Device Type</th>
+                <th>Owner Name</th>
+                <th>Battery Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Devices will be listed here -->
+        </tbody>
+    </table>
+
+    <script>
+        // JavaScript code
+        let devices = [];
+
+        // Load devices from localStorage
+        if (localStorage.getItem('devices')) {
+            devices = JSON.parse(localStorage.getItem('devices'));
+        }
+
+        function saveDevices() {
+            localStorage.setItem('devices', JSON.stringify(devices));
+        }
+
+        function renderDevices() {
+            const tbody = document.querySelector('#deviceTable tbody');
+            tbody.innerHTML = '';
+            devices.forEach((device, index) => {
+                const tr = document.createElement('tr');
+
+                const tdName = document.createElement('td');
+                tdName.textContent = device.deviceName;
+                tr.appendChild(tdName);
+
+                const tdType = document.createElement('td');
+                tdType.textContent = device.deviceType;
+                tr.appendChild(tdType);
+
+                const tdOwner = document.createElement('td');
+                tdOwner.textContent = device.ownerName;
+                tr.appendChild(tdOwner);
+
+                const tdBattery = document.createElement('td');
+                tdBattery.textContent = device.batteryStatus + '%';
+                tr.appendChild(tdBattery);
+
+                const tdActions = document.createElement('td');
+
+                const btnUpdate = document.createElement('button');
+                btnUpdate.textContent = 'Update';
+                btnUpdate.addEventListener('click', () => {
+                    updateDevice(index);
+                });
+                tdActions.appendChild(btnUpdate);
+
+                const btnDelete = document.createElement('button');
+                btnDelete.textContent = 'Delete';
+                btnDelete.addEventListener('click', () => {
+                    deleteDevice(index);
+                });
+                tdActions.appendChild(btnDelete);
+
+                tr.appendChild(tdActions);
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        function addDevice(device) {
+            devices.push(device);
+            saveDevices();
+            renderDevices();
+            startBatteryDrain(devices.length - 1);
+        }
+
+        function updateDevice(index) {
+            const device = devices[index];
+            const newDeviceName = prompt('Enter new Device Name:', device.deviceName);
+            if (newDeviceName !== null && newDeviceName.trim() !== '') {
+                device.deviceName = newDeviceName.trim();
+            }
+
+            const newDeviceType = prompt('Enter new Device Type (Smartphone, Tablet, Camera):', device.deviceType);
+            if (newDeviceType !== null && ['Smartphone', 'Tablet', 'Camera'].includes(newDeviceType)) {
+                device.deviceType = newDeviceType;
+            }
+
+            const newOwnerName = prompt('Enter new Owner Name:', device.ownerName);
+            if (newOwnerName !== null && newOwnerName.trim() !== '') {
+                device.ownerName = newOwnerName.trim();
+            }
+
+            const newBatteryStatus = prompt('Enter new Battery Status (0-100):', device.batteryStatus);
+            if (newBatteryStatus !== null) {
+                let batteryStatus = parseInt(newBatteryStatus);
+                if (!isNaN(batteryStatus) && batteryStatus >= 0 && batteryStatus <= 100) {
+                    device.batteryStatus = batteryStatus;
+                }
+            }
+
+            saveDevices();
+            renderDevices();
+        }
+
+        function deleteDevice(index) {
+            clearInterval(devices[index].batteryInterval);
+            devices.splice(index, 1);
+            saveDevices();
+            renderDevices();
+        }
+
+        function startBatteryDrain(index) {
+            if (index >= devices.length) return;
+            const device = devices[index];
+            device.batteryInterval = setInterval(() => {
+                if (device.batteryStatus > 0) {
+                    device.batteryStatus -= 1;
+                    saveDevices();
+                    renderDevices();
+                } else {
+                    clearInterval(device.batteryInterval);
+                }
+            }, 1000);
+        }
+
+        // Start battery drain for all devices
+        devices.forEach((device, index) => {
+            if (device.batteryStatus > 0) {
+                startBatteryDrain(index);
+            }
+        });
+
+        document.getElementById('deviceForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const deviceName = document.getElementById('deviceName').value.trim();
+            const deviceType = document.getElementById('deviceType').value;
+            const ownerName = document.getElementById('ownerName').value.trim();
+            const batteryStatus = parseInt(document.getElementById('batteryStatus').value);
+
+            if (
+                !deviceName ||
+                !deviceType ||
+                !ownerName ||
+                isNaN(batteryStatus) ||
+                batteryStatus < 0 ||
+                batteryStatus > 100
+            ) {
+                alert('Please fill out all fields correctly.');
+                return;
+            }
+
+            const device = {
+                deviceName,
+                deviceType,
+                ownerName,
+                batteryStatus,
+            };
+
+            addDevice(device);
+
+            // Reset the form
+            document.getElementById('deviceForm').reset();
+        });
+
+        // Initial render
+        renderDevices();
+    </script>
 </body>
 </html>
-```
