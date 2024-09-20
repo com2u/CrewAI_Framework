@@ -48,7 +48,6 @@ developmentProject="""Create a web page for a device management app. The page sh
          Add the possibility to update all device settings or delete existing devices.
          Add the possibility to create new devices with a screen to input the data.
          When a device was added decrease the per device given Battery Status every second by 1% until it reaches 0%.
-         Store the device data in the local browser store.
          Your solution should be one HTML page with all components, styles and JavaScript code in this file"""
 
 
@@ -68,52 +67,17 @@ codeing_agent = Agent(
     goal="From the manager you get the list of tasks. Start with the first task to solve it. You will create the HTML web page with all the needed components. Allways provide the full code. Don't use place holders or references to existing code. The code needs allways to be complete with all implementations which have been made. You will output the needed sourcecode for the web page.",
     backstory="You are professional web developer for HTML, JS, and CSS",
     #llm=ChatOpenAI(model_name="gpt-4o", temperature=0.3),
-    llm=llama31,
+    llm=mistral,
     allow_delegation=False,
     #allow_code_execution=True,
     #tools=[requirement],
     verbose=True
 )
 
-codeing_agent2 = Agent(
-    role="Professional web coding agent",
-    goal="Improve the existing implementation. Update the HTML web page with all the needed components. Allways provide the full code. Don't use place holders or references to existing code. The code needs allways to be complete with all implementations which have been made. You will output the needed sourcecode for the web page.",
-    backstory="You are professional web developer for HTML, JS, and CSS",
-    #llm=ChatOpenAI(model_name="gpt-4o", temperature=0.3),
-    llm=llama31,
-    allow_delegation=False,
-    #tools=[requirement],
-    #allow_code_execution=True,
-    verbose=True
-)
-
-codeing_agent3 = Agent(
-    role="Professional web coding agent",
-    goal="Improve the existing implementation. Update the HTML web page with all the needed components. Allways provide the full code. Don't use place holders or references to existing code. The code needs allways to be complete with all implementations which have been made. You will output the needed sourcecode for the web page.",
-    backstory="You are professional web developer for HTML, JS, and CSS",
-    #llm=ChatOpenAI(model_name="gpt-4o", temperature=0.3),
-    llm=llama31,
-    allow_delegation=False,
-    #tools=[requirement],
-    #allow_code_execution=True,
-    verbose=True
-)
-
-codeing_agent4 = Agent(
-    role="Professional web coding agent",
-    goal="Improve the existing implementation. Update the HTML web page with all the needed components. Allways provide the full code. Don't use place holders or references to existing code. The code needs allways to be complete with all implementations which have been made. You will output the needed sourcecode for the web page.",
-    backstory="You are professional web developer for HTML, JS, and CSS",
-    #llm=ChatOpenAI(model_name="gpt-4o", temperature=0.3),
-    llm=llama31,
-    allow_delegation=False,
-    #tools=[requirement],
-    #allow_code_execution=True,
-    verbose=True
-)
 
 codereview_agent = Agent(
     role="Code reviewer",
-    goal="Check the given code and provide one suggestion to make the code more stable, robust or professional. Requirement: "+developmentProject,
+    goal="Check the given code and provide one suggestion to make the code more stable, robust or professional. But always stick with the requirements: "+developmentProject,
     backstory="""You are a professional web developer. You think about code quality, coding style, architecture, naming, error handling
     """,
     llm=llama31,
@@ -124,7 +88,7 @@ codereview_agent = Agent(
 
 uiux_agent = Agent(
     role="Frontend designer for UI/UX",
-    goal="Check the given code and provide one suggestion to improve the design, layout, usability or look&feel",
+    goal="Check the given code and provide one suggestion to improve the design, layout, usability or look&feel. But always stick with the requirements: "+developmentProject,
     backstory="""You are a professional designer with focus on UI/UX. You think about user interaction and a clean logic and consitent frontend""",
     llm=llama31,
     allow_delegation=False,
@@ -178,12 +142,12 @@ codingTask11 = Task(
     description=f"Start implementing the second task from task list created by the manager",
     expected_output="Just provide the full code without any explanation as index.html to be opened with a browser. ONLY SOURCE CODE NO ADDITIONAL MARKS, TEXT OR COMMENTS",
     output_file="public/index11.html",
-    context=[managementTask11],
+    context=[codingTask1, managementTask11],
     agent=codeing_agent
 )
 
 reviewTask1 = Task(
-    description="do a proper code review from the coding agent results and share your suggestion to improve the code",
+    description="Do a proper code review from the coding agent results and share your suggestion to improve the code",
     expected_output="""Explain one most important suggestion to improve the code in markdown format""",
     output_file="markdown/review1.md",
     context=[codingTask11],
@@ -194,7 +158,7 @@ codingTask2 = Task(
     description=f"Improve the existing implementation und provide the updated HTML page with all needed components. Always provide the full complete code and no fragments.",
     expected_output="Just provide the full code without any explanation as index.html to be opened with a browser. ONLY SOURCE CODE NO ADDITIONAL MARKS, TEXT OR COMMENTS",
     output_file="public/index2.html",
-    context=[reviewTask1],
+    context=[codingTask11, reviewTask1],
     agent=codeing_agent
 )
 
@@ -211,8 +175,8 @@ codingTask3 = Task(
     description=f"Start implementing the second task from task list created by the manager. Requirement: "+developmentProject,
     expected_output="Just provide the full code without any explanation as index.html to be opened with a browser. ONLY SOURCE CODE NO ADDITIONAL MARKS, TEXT OR COMMENTS",
     output_file="public/index3.html",
-    context=[designerTask1],
-    agent=codeing_agent2
+    context=[codingTask2, designerTask1],
+    agent=codeing_agent
 )
 
 reviewTask2 = Task(
@@ -227,8 +191,8 @@ codingTask4 = Task(
     description=f"Improve the existing implementation und provide the updated HTML page with all needed components. Always provide the full complete code and no fragments. Keep the requirements in mind:"+developmentProject,
     expected_output="Just provide the full code without any explanation as index.html to be opened with a browser. ONLY SOURCE CODE NO ADDITIONAL MARKS, TEXT OR COMMENTS",
     output_file="public/index4.html",
-    context=[reviewTask2],
-    agent=codeing_agent2
+    context=[codingTask3, reviewTask2],
+    agent=codeing_agent
 )
 
 
@@ -244,8 +208,8 @@ codingTask5 = Task(
     description=f"Improve the existing implementation und provide the updated HTML page with all needed components. Always provide the full complete code and no fragments. And double check the requirments:"+developmentProject,
     expected_output="Just provide the full code without any explanation as index.html to be opened with a browser. ONLY SOURCE CODE NO ADDITIONAL MARKS, TEXT OR COMMENTS",
     output_file="public/index5.html",
-    context=[designerTask2],
-    agent=codeing_agent3
+    context=[codingTask4, designerTask2],
+    agent=codeing_agent
 )
 
 reviewTask3 = Task(
@@ -260,8 +224,8 @@ codingTask6 = Task(
     description=f"Improve the existing implementation und provide the updated HTML page with all needed components. Always provide the full complete code and no fragments. Check the requirements:"+developmentProject,
     expected_output="Just provide the full code without any explanation as index.html to be opened with a browser. ONLY SOURCE CODE NO ADDITIONAL MARKS, TEXT OR COMMENTS",
     output_file="public/index6.html",
-    context=[reviewTask3],
-    agent=codeing_agent4
+    context=[codingTask5, reviewTask3],
+    agent=codeing_agent
 )
 
 

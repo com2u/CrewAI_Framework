@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Management App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .device-form, .device-list {
+            margin: 20px 0;
+        }
+        .device-item {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .device-item div {
+            margin: 0 10px;
+        }
+        .device-item button {
+            margin-left: 10px;
+        }
+        .battery-status {
+            font-weight: bold;
+        }
+        .low-battery {
+            background-color: yellow;
+        }
+        .no-battery {
+            border: 1px solid red;
+        }
+        .device-list {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .device-item {
+            margin: 10px;
+            width: calc(33.33% - 20px);
+        }
+        @media (max-width: 768px) {
+            .device-item {
+                width: calc(50% - 20px);
+            }
+        }
+        @media (max-width: 480px) {
+            .device-item {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Device Management App</h1>
+    <div class="device-form">
+        <h2>Add New Device</h2>
+        <form id="addDeviceForm">
+            <label>
+                Device Name:
+                <input type="text" id="deviceName" required pattern="[a-zA-Z ]+">
+            </label>
+            <br>
+            <label>
+                Device Type:
+                <select id="deviceType" required>
+                    <option value="Smartphone">Smartphone</option>
+                    <option value="Tablet">Tablet</option>
+                    <option value="Camera">Camera</option>
+                </select>
+            </label>
+            <br>
+            <label>
+                Owner Name:
+                <input type="text" id="ownerName" required pattern="[a-zA-Z ]+">
+            </label>
+            <br>
+            <label>
+                Battery Status (%):
+                <input type="number" id="batteryStatus" min="0" max="100" step="1" required>
+            </label>
+            <br>
+            <button type="submit">Add Device</button>
+        </form>
+    </div>
+    <div class="device-list">
+        <h2>Existing Devices</h2>
+        <div id="deviceContainer"></div>
+    </div>
+    <script>
+        class DeviceManager {
+            constructor() {
+                this.devices = JSON.parse(localStorage.getItem('devices')) || [];
+            }
+
+            loadDevices(container) {
+                container.innerHTML = '';
+                this.devices.forEach((device, index) => {
+                    const deviceItem = document.createElement('div');
+                    deviceItem.className = 'device-item';
+                    deviceItem.id = `device-${index}`;
+                    deviceItem.innerHTML = `
+                        <div>
+                            <strong>${device.deviceName}</strong> (${device.deviceType})<br>
+                            Owner: ${device.ownerName}<br>
+                            Battery: <span class="battery-status">${device.batteryStatus}%</span>
+                        </div>
+                        <div>
+                            <button onclick="deviceManager.updateDevice(${index})">Update</button>
+                            <button onclick="deviceManager.deleteDevice(${index})">Delete</button>
+                        </div>
+                    `;
+                    if (device.batteryStatus <= 50) {
+                        deviceItem.classList.add('low-battery');
+                    }
+                    if (device.batteryStatus === 0) {
+                        deviceItem.classList.add('no-battery');
+                    }
+                    container.appendChild(deviceItem);
+                });
+            }
+
+            saveDevices() {
+                localStorage.setItem('devices', JSON.stringify(this.devices));
+            }
+
+            updateBatteryStatus() {
+                this.devices.forEach(device => {
+                    if (device.batteryStatus > 0) {
+                        device.batteryStatus -= 1;
+                    }
+                });
+                this.saveDevices();
+                this.loadDevices(document.getElementById('deviceContainer'));
+            }
+
+            addDevice(device) {
+                this.devices.push(device);
+                this.saveDevices();
+                this.loadDevices(document.getElementById('deviceContainer'));
+            }
+
+            updateDevice(index) {
+                const device = this.devices[index];
+                const newDeviceName = prompt('Enter new device name:', device.deviceName);
+                const newDeviceType = prompt('Enter new device type (Smartphone, Tablet, Camera):', device.deviceType);
+                const newOwnerName = prompt('Enter new owner name:', device.ownerName);
+                const newBatteryStatus = prompt('Enter new battery status (0-100):', device.batteryStatus);
+
+                if (newDeviceName && newDeviceType && newOwnerName && newBatteryStatus) {
+                    this.devices[index] = {
+                        deviceName: newDeviceName,
+                        deviceType: newDeviceType,
+                        ownerName: newOwnerName,
+                        batteryStatus: parseInt(newBatteryStatus, 10)
+                    };
+                    this.saveDevices();
+                    this.loadDevices(document.getElementById('deviceContainer'));
+                }
+            }
+
+            deleteDevice(index) {
+                this.devices.splice(index, 1);
+                this.saveDevices();
+                this.loadDevices(document.getElementById('deviceContainer'));
+            }
+        }
+
+        const deviceManager = new DeviceManager();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const deviceContainer = document.getElementById('deviceContainer');
+            const addDeviceForm = document.getElementById('addDeviceForm');
+
+            deviceManager.loadDevices(deviceContainer);
+
+            setInterval(() => deviceManager.updateBatteryStatus(), 1000);
+
+            addDeviceForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const deviceName = document.getElementById('deviceName').value.trim();
+                const deviceType = document.getElementById('deviceType').value;
+                const ownerName = document.getElementById('ownerName').value.trim();
+                const batteryStatus = parseInt(document.getElementById('batteryStatus').value, 10);
+
+                if (deviceName && deviceType && ownerName && batteryStatus >= 0 && batteryStatus <= 100) {
+                    deviceManager.addDevice({ deviceName, deviceType, ownerName, batteryStatus });
+                    addDeviceForm.reset();
+                } else {
+                    alert("Please fill out all required fields and ensure that the Battery Status is a number between 0 and 100.");
+                }
+            });
+        });
+    </script>
+</body>
+</html>

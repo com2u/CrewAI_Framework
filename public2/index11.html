@@ -1,0 +1,162 @@
+my best complete final answer to the task.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Management App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .device-form, .device-list {
+            margin: 20px 0;
+        }
+        .device-item {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .device-item div {
+            margin: 0 10px;
+        }
+        .device-item button {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Device Management App</h1>
+    <div class="device-form">
+        <h2>Add New Device</h2>
+        <form id="addDeviceForm">
+            <label>
+                Device Name:
+                <input type="text" id="deviceName" required>
+            </label>
+            <br>
+            <label>
+                Device Type:
+                <select id="deviceType" required>
+                    <option value="Smartphone">Smartphone</option>
+                    <option value="Tablet">Tablet</option>
+                    <option value="Camera">Camera</option>
+                </select>
+            </label>
+            <br>
+            <label>
+                Owner Name:
+                <input type="text" id="ownerName" required>
+            </label>
+            <br>
+            <label>
+                Battery Status (%):
+                <input type="number" id="batteryStatus" min="0" max="100" required>
+            </label>
+            <br>
+            <button type="submit">Add Device</button>
+        </form>
+    </div>
+    <div class="device-list">
+        <h2>Existing Devices</h2>
+        <div id="deviceContainer"></div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const deviceContainer = document.getElementById('deviceContainer');
+            const addDeviceForm = document.getElementById('addDeviceForm');
+
+            const loadDevices = () => {
+                const devices = JSON.parse(localStorage.getItem('devices')) || [];
+                deviceContainer.innerHTML = '';
+                devices.forEach((device, index) => {
+                    const deviceItem = document.createElement('div');
+                    deviceItem.className = 'device-item';
+                    deviceItem.innerHTML = `
+                        <div>
+                            <strong>${device.deviceName}</strong> (${device.deviceType})<br>
+                            Owner: ${device.ownerName}<br>
+                            Battery: <span class="battery-status">${device.batteryStatus}%</span>
+                        </div>
+                        <div>
+                            <button onclick="updateDevice(${index})">Update</button>
+                            <button onclick="deleteDevice(${index})">Delete</button>
+                        </div>
+                    `;
+                    deviceContainer.appendChild(deviceItem);
+                });
+            };
+
+            const saveDevices = (devices) => {
+                localStorage.setItem('devices', JSON.stringify(devices));
+            };
+
+            const updateBatteryStatus = () => {
+                const devices = JSON.parse(localStorage.getItem('devices')) || [];
+                devices.forEach(device => {
+                    if (device.batteryStatus > 0) {
+                        device.batteryStatus -= 1;
+                    }
+                });
+                saveDevices(devices);
+                loadDevices();
+            };
+
+            setInterval(updateBatteryStatus, 1000);
+
+            addDeviceForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const deviceName = document.getElementById('deviceName').value;
+                const deviceType = document.getElementById('deviceType').value;
+                const ownerName = document.getElementById('ownerName').value;
+                const batteryStatus = parseInt(document.getElementById('batteryStatus').value, 10);
+
+                const devices = JSON.parse(localStorage.getItem('devices')) || [];
+                devices.push({ deviceName, deviceType, ownerName, batteryStatus });
+                saveDevices(devices);
+                loadDevices();
+                addDeviceForm.reset();
+            });
+
+            window.updateDevice = (index) => {
+                const devices = JSON.parse(localStorage.getItem('devices')) || [];
+                const device = devices[index];
+                const newDeviceName = prompt('Enter new device name:', device.deviceName);
+                const newDeviceType = prompt('Enter new device type (Smartphone, Tablet, Camera):', device.deviceType);
+                const newOwnerName = prompt('Enter new owner name:', device.ownerName);
+                const newBatteryStatus = prompt('Enter new battery status (0-100):', device.batteryStatus);
+
+                if (newDeviceName && newDeviceType && newOwnerName && newBatteryStatus) {
+                    devices[index] = {
+                        deviceName: newDeviceName,
+                        deviceType: newDeviceType,
+                        ownerName: newOwnerName,
+                        batteryStatus: parseInt(newBatteryStatus, 10)
+                    };
+                    saveDevices(devices);
+                    loadDevices();
+                }
+            };
+
+            window.deleteDevice = (index) => {
+                const devices = JSON.parse(localStorage.getItem('devices')) || [];
+                devices.splice(index, 1);
+                saveDevices(devices);
+                loadDevices();
+            };
+
+            loadDevices();
+        });
+    </script>
+</body>
+</html>
+```
