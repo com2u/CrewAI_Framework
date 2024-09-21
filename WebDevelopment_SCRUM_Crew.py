@@ -6,9 +6,31 @@ from langchain_community.llms import Ollama
 #from llama_index.llms.openrouter import OpenRouter
 from CalculatorTool import calculate, code, requirement
 
+developmentProjectSubTask = [
+    """Create a web page for a device management app. The page should maintain different devices in a web page. 
+             The device management app should maintain the following data per device:
+             ·        Device Name (String)
+             ·        DeviceType (Allowed types: Smartphone, Tablet, Camera)
+             ·        Owner Name (String)
+             ·        Battery Status (0…100%)
+             List existing devices of the app in a table.
+             Add the possibility to create new devices with a screen to input the data.
+             Your solution should be one HTML page with all components, styles and JavaScript code in this file.""",
+   "Add the possibility to update a settings of a selected device in one screen or delete existing devices.\n\r",
+   "When a device was added decrease the per device given Battery Status every second by 1% until it reaches 0%.\n\r"
+   "Make sure to update battery status every second in the table.\n\r"
+   "Add a colored visualization (e.g. Progress bar) of the battery status to the device table.\n\r",
+   "Use unicode icons for the device types Smartphone, Tablet, Camera.\n\r",
+   "Mark an empty device in red and a device with power in green. Make sure it will stay red when 0% are reached.\n\r",
+   "Provide the possibility to order the device table by Device Name, DeviceType, Owner Name, Battery Status.\n\r",
+   "Add to the existing devices types: Laptop, Car, Powerbank. Provide a matching icon\n\r",
+   ""
+]
+
+#    "Store the device settings in the local browser store. Load the devices from the browser store with the page. Make sure it will work when the store is empty and nothing was created (e.g. first start).\n\r",
+
 print("## Starting CrewAI Framwork")
 load_dotenv()
-
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 os.environ["OPENAI_MODEL_NAME"] = os.getenv("OPENAI_MODEL_NAME")
 
@@ -31,6 +53,7 @@ os.environ["OPENAI_MODEL_NAME"] = os.getenv("OPENAI_MODEL_NAME")
 #  streaming=True
 #)
 
+
 llama31 = Ollama(model="llama3.1", base_url="http://100.126.56.111:11434")
 #llama31 = Ollama(model="llama3.1", base_url="https://openrouter.ai/api/v1")
 #codestral = Ollama(model="codestral:latest", base_url="http://100.126.56.111:11434")
@@ -38,17 +61,7 @@ llama31 = Ollama(model="llama3.1", base_url="http://100.126.56.111:11434")
 #commandr = Ollama(model="command-r:latest", base_url="http://100.126.56.111:11434")
 
 # Provide the project requirement
-developmentProject="""Create a web page for a device management app. The page should maintain different devices in a web page. 
-         The device management app should maintain the following data per device:
-         ·        Device Name (String)
-         ·        DeviceType (Allowed types: Smartphone, Tablet, Camera)
-         ·        Owner Name (String)
-         ·        Battery Status (0…100%)
-         List existing devices of the app
-         Add the possibility to update all device settings or delete existing devices.
-         Add the possibility to create new devices with a screen to input the data.
-         When a device was added decrease the per device given Battery Status every second by 1% until it reaches 0%.
-         Your solution should be one HTML page with all components, styles and JavaScript code in this file"""
+developmentProject=""
 
 
 # Static code which does not need to be changed for the different tasks in the defined environment
@@ -77,7 +90,7 @@ codeing_agent = Agent(
 
 codereview_agent = Agent(
     role="Code reviewer",
-    goal="Check the given code and provide one suggestion to make the code more stable, robust or professional. ",
+    goal="Check the given code and provide one suggestion to make the code more stable, robust or professional. Never suggest to extract JavaScript or CSS to an external file.",
     backstory="""You are a professional web developer. You think about code quality, coding style, architecture, naming, error handling
     """,
     llm=ChatOpenAI(model_name="gpt-4o", temperature=0.3),
@@ -111,7 +124,7 @@ documentation_agent = Agent(
 
 test_agent = Agent(
     role="Software tester",
-    goal="You will check that the code contains all requirements. Provide a test.md to document the check results. Generate a list of all requirements you can check. Requirement: "+developmentProject,
+    goal="You will check that the code contains all requirements. Provide a test.md to document the check results. Generate a list of all requirements you can check.",
     backstory="""You are an professional tester by reading the requirements and comparing them with the implementation """,
     #llm=llama31,
     llm=ChatOpenAI(model_name="gpt-4o", temperature=0.3),
@@ -128,7 +141,7 @@ managementTask = Task(
 )
 
 codingTask = Task(
-    description=f"Start implementing the task bases on the existing feedback of manager, reviewer and desigener. ",
+    description=f"Start implementing the task bases on the existing feedback of manager, reviewer and designer. ",
     expected_output="Just provide the full code without any explanation as index.html to be opened with a browser. ONLY SOURCE CODE NO ADDITIONAL MARKS, TEXT OR COMMENTS",
     output_file="public/index.html",
     agent=codeing_agent
@@ -180,8 +193,15 @@ crew = Crew(
 
 def crewLoop(developmentProject, managementTask, codingTask, crew):
     result = ""
-    for loops in range(3):
+    loop = 0
+    for subtask in developmentProjectSubTask:
+        loop = loop +1
         implementation = ""
+        developmentProject = developmentProject+subtask
+        f_out1 = open(f"markdown/requirement{loop}.md", "w+")
+        f_out1.write(developmentProject)
+        f_out1.close()
+
         try: 
             f = open("public/index.html", "r") 
             implementation = f.read()
@@ -191,7 +211,7 @@ def crewLoop(developmentProject, managementTask, codingTask, crew):
 
         readme = ""
         try: 
-            f = open("markdown/Readme.md", "r") 
+            f = open(f"markdown/Readme{loop}.md", "r")
             readme = f.read()
             print(readme)
         except Exception as e: 
@@ -199,7 +219,7 @@ def crewLoop(developmentProject, managementTask, codingTask, crew):
 
         review = ""
         try: 
-            f = open("markdown/review.md", "r") 
+            f = open(f"markdown/review{loop}.md", "r")
             review = f.read()
             print(review)
         except Exception as e: 
@@ -207,7 +227,7 @@ def crewLoop(developmentProject, managementTask, codingTask, crew):
 
         uiux = ""
         try: 
-            f = open("markdown/uiux.md", "r") 
+            f = open(f"markdown/uiux{loop}.md", "r")
             uiux = f.read()
             print(uiux)
         except Exception as e: 
@@ -230,23 +250,32 @@ def crewLoop(developmentProject, managementTask, codingTask, crew):
         {uiux}
         """
         result = crew.kickoff()
-
         implementation = ""
-        try: 
-            f = open("public/index.html", "w+")
-            f2 = open(f"public/index{loops}.html", "w+")
-            implementation = f.read()
-            implementation = implementation.replace("```html","")
-            implementation = implementation.replace("```","")
-            f.write(implementation)
-            f.close()
-            f2.write(implementation)
-            f2.close()
-            print(implementation)
-        except Exception as e: 
-            print(e)
+        cleanupSourceCode(loop)
 
     return result
+
+
+def cleanupSourceCode(loop):
+    try:
+        f_in = open("public/index.html", "r")
+        implementation = f_in.read()
+        print("File cleanup start:")
+        print(implementation)
+        implementation = implementation.replace("```html", "")
+        implementation = implementation.replace("```", "")
+        implementation = implementation.replace("my best complete final answer to the task.", "")
+        f_out1 = open("public/index.html", "w+")
+        f_out2 = open(f"public/index{loop}.html", "w+")
+        f_out1.write(implementation)
+        f_out1.close()
+        f_out2.write(implementation)
+        f_out2.close()
+        print("File cleanup done:")
+        print(implementation)
+
+    except Exception as e:
+        print(e)
 
 
 result = crewLoop(developmentProject, managementTask, codingTask, crew)
