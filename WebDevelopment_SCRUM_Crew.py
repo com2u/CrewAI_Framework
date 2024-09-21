@@ -179,6 +179,7 @@ crew = Crew(
 
 
 def crewLoop(developmentProject, managementTask, codingTask, crew):
+    result = ""
     for loops in range(3):
         implementation = ""
         try: 
@@ -232,12 +233,15 @@ def crewLoop(developmentProject, managementTask, codingTask, crew):
 
         implementation = ""
         try: 
-            f = open("public/index.html", "r") 
+            f = open("public/index.html", "w+")
+            f2 = open(f"public/index{loops}.html", "w+")
             implementation = f.read()
             implementation = implementation.replace("```html","")
             implementation = implementation.replace("```","")
             f.write(implementation)
             f.close()
+            f2.write(implementation)
+            f2.close()
             print(implementation)
         except Exception as e: 
             print(e)
