@@ -213,22 +213,35 @@ def crewLoop(developmentProject, managementTask, codingTask, crew):
             print(e)
 
         managementTask.description = f"""Use and always stick with the following requirements: 
-    ### Requirement
-    {developmentProject}
-    ### Reference implementation README.md:
-    {readme} 
-    ### Reference implementation CODE:
-    {implementation}
-    """
+        ### Requirement
+        {developmentProject}
+        ### Reference implementation README.md:
+        {readme} 
+        ### Reference implementation CODE:
+        {implementation}
+        """
 
         codingTask.description=f"""Start implementing the task bases on the existing feedback of manager, reviewer and desigener. 
-    {managementTask.description}
-    ### Code Review:
-    {review}
-    ### Design UI/UX Review:
-    {uiux}
-    """
+        {managementTask.description}
+        ### Code Review:
+        {review}
+        ### Design UI/UX Review:
+        {uiux}
+        """
         result = crew.kickoff()
+
+        implementation = ""
+        try: 
+            f = open("public/index.html", "r") 
+            implementation = f.read()
+            implementation = implementation.replace("```html","")
+            implementation = implementation.replace("```","")
+            f.write(implementation)
+            f.close()
+            print(implementation)
+        except Exception as e: 
+            print(e)
+
     return result
 
 
