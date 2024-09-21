@@ -124,7 +124,7 @@ managementTask1 = Task(
 )
 
 codingTask1 = Task(
-    description=f"Start implementing the first task from task list created by the manager",
+    description=f"Start implementing the first task from task list created by the manager. ",
     expected_output="Just provide the full code without any explanation as index.html to be opened with a browser. ONLY SOURCE CODE NO ADDITIONAL MARKS, TEXT OR COMMENTS",
     output_file="public/index1.html",
     context=[managementTask1],
@@ -255,6 +255,9 @@ crew = Crew(
 )
 
 result = crew.kickoff()
+
+codingTask1.description = codingTask1.description + " Use this reference implementation as start:\n\r"+result
+
 
 print(result)
 
