@@ -3,14 +3,17 @@ from crewai import Agent, Task, Crew, Process
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_community.llms import Ollama
-#from llama_index.llms.openrouter import OpenRouter
-from CalculatorTool import calculate, code, requirement
+#from langchain_anthropic import ChatAnthropic
+
+
+
 
 print("## Starting CrewAI Framwork")
 load_dotenv()
 
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 os.environ["OPENAI_MODEL_NAME"] = os.getenv("OPENAI_MODEL_NAME")
+os.environ["ANTHROPIC_API_KEY"] = os.getenv("ANTHROPIC_API_KEY")
 
 #os.environ["OPENAI_API_BASE"] = 'http://100.126.56.111:11434/v1'
 #os.environ["OPENAI_MODEL_NAME"] ='llama3.1:latest'  # Adjust based on available model
@@ -31,11 +34,16 @@ os.environ["OPENAI_MODEL_NAME"] = os.getenv("OPENAI_MODEL_NAME")
 #  streaming=True
 #)
 
+#anthropic_llm = ChatAnthropic(model="claude-3-opus-2024229")
 llama31 = Ollama(model="llama3.1", base_url="http://100.126.56.111:11434")
-#llama31 = Ollama(model="llama3.1", base_url="https://openrouter.ai/api/v1")
+openRouter = Ollama(model="claude-3.5-sonnet", base_url="https://openrouter.ai/api/v1")
 codestral = Ollama(model="codestral:latest", base_url="http://100.126.56.111:11434")
 mistral = Ollama(model="mistral-nemo:latest", base_url="http://100.126.56.111:11434")
 commandr = Ollama(model="command-r:latest", base_url="http://100.126.56.111:11434")
+#llm=ChatOpenAI(model_name="gpt-4o", temperature=0.3)
+
+llm_coding = llama31
+llm_knoledge = llama31
 
 # Provide the project requirement
 developmentProject="""Create a web page for a device management app. The page should maintain different devices in a web page. 
@@ -56,8 +64,8 @@ manager = Agent(
     role="Manager for a software development team",
     goal="You will get tasks and requirements for a software development project. You will read the task and split it into sub tasks for the development.",
     backstory="You know the complexity of software development and break down complex tasks into several individual implementation steps",
-    #llm=ChatOpenAI(model_name="gpt-4o", temperature=0.3),
-    llm=llama31,
+
+    llm=llm_knoledge,
     allow_delegation=False,
     verbose=True
 )
@@ -67,7 +75,7 @@ codeing_agent = Agent(
     goal="From the manager you get the list of tasks. Start with the first task to solve it. You will create the HTML web page with all the needed components. Allways provide the full code. Don't use place holders or references to existing code. The code needs allways to be complete with all implementations which have been made. You will output the needed sourcecode for the web page.",
     backstory="You are professional web developer for HTML, JS, and CSS",
     #llm=ChatOpenAI(model_name="gpt-4o", temperature=0.3),
-    llm=mistral,
+    llm=llm_knoledge,
     allow_delegation=False,
     #allow_code_execution=True,
     #tools=[requirement],
@@ -80,7 +88,7 @@ codereview_agent = Agent(
     goal="Check the given code and provide one suggestion to make the code more stable, robust or professional. But always stick with the requirements: "+developmentProject,
     backstory="""You are a professional web developer. You think about code quality, coding style, architecture, naming, error handling
     """,
-    llm=llama31,
+    llm=llm_coding,
     allow_delegation=False,
     #tools=[requirement],
     verbose=True
@@ -90,7 +98,7 @@ uiux_agent = Agent(
     role="Frontend designer for UI/UX",
     goal="Check the given code and provide one suggestion to improve the design, layout, usability or look&feel. But always stick with the requirements: "+developmentProject,
     backstory="""You are a professional designer with focus on UI/UX. You think about user interaction and a clean logic and consitent frontend""",
-    llm=llama31,
+    llm=llm_knoledge,
     allow_delegation=False,
     #tools=[requirement],
     verbose=True
@@ -100,7 +108,7 @@ documentation_agent = Agent(
     role="Development software documentation",
     goal="Provide a Readme.md to document the technical software documentation and how to use it. Describe what the user can do with the software and how to use the frontend and its components.",
     backstory="""You are an expert for professional software documentation. You think about structure of the documentation. All documentation should be logic, clean and easy to read. """,
-    llm=llama31,
+    llm=llm_knoledge,
     allow_delegation=False,
     #tools=[requirement],
     verbose=True
@@ -110,7 +118,7 @@ test_agent = Agent(
     role="Software tester",
     goal="You will check that the code contains all requirements. Provide a test.md to document the check results. Generate a list of all requirements you can check. Requirement: "+developmentProject,
     backstory="""You are an professional tester by reading the requirements and comparing them with the implementation """,
-    llm=llama31,
+    llm=llm_knoledge,
     allow_delegation=False,
     #tools=[requirement],
     verbose=True

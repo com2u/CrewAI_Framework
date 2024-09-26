@@ -46,6 +46,8 @@ Thumbs.db
 .vscode/
 .venv
 venv
+tmp/
+temp/
 
 ### C ###
 # Prerequisites

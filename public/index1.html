@@ -1,6 +1,3 @@
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,53 +7,65 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
         }
         h1 {
             text-align: center;
+            color: #333;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
-        }
-        table, th, td {
-            border: 1px solid black;
+            background-color: #fff;
         }
         th, td {
-            padding: 10px;
+            border: 1px solid #ddd;
+            padding: 12px;
             text-align: left;
         }
-        form {
-            max-width: 600px;
-            margin: 0 auto;
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
         }
-        form div {
-            margin-bottom: 10px;
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
         label {
             display: block;
             margin-bottom: 5px;
+            font-weight: bold;
         }
-        input[type="text"], input[type="number"], select {
+        input, select {
             width: 100%;
             padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
             box-sizing: border-box;
         }
-        input[type="submit"] {
-            padding: 10px 20px;
+        button {
             background-color: #4CAF50;
             color: white;
+            padding: 10px 15px;
             border: none;
+            border-radius: 4px;
             cursor: pointer;
+            font-size: 16px;
         }
-        input[type="submit"]:hover {
+        button:hover {
             background-color: #45a049;
         }
     </style>
 </head>
 <body>
     <h1>Device Management App</h1>
+
     <table id="deviceTable">
         <thead>
             <tr>
@@ -67,64 +76,70 @@
             </tr>
         </thead>
         <tbody>
-            <!-- Existing devices will be listed here -->
         </tbody>
     </table>
+
     <form id="deviceForm">
-        <div>
-            <label for="deviceName">Device Name:</label>
-            <input type="text" id="deviceName" name="deviceName" required>
-        </div>
-        <div>
-            <label for="deviceType">Device Type:</label>
-            <select id="deviceType" name="deviceType" required>
-                <option value="Smartphone">Smartphone</option>
-                <option value="Tablet">Tablet</option>
-                <option value="Camera">Camera</option>
-            </select>
-        </div>
-        <div>
-            <label for="ownerName">Owner Name:</label>
-            <input type="text" id="ownerName" name="ownerName" required>
-        </div>
-        <div>
-            <label for="batteryStatus">Battery Status (%):</label>
-            <input type="number" id="batteryStatus" name="batteryStatus" min="0" max="100" required>
-        </div>
-        <div>
-            <input type="submit" value="Add Device">
-        </div>
+        <h2>Add New Device</h2>
+        <label for="deviceName">Device Name:</label>
+        <input type="text" id="deviceName" required>
+
+        <label for="deviceType">Device Type:</label>
+        <select id="deviceType" required>
+            <option value="">Select Device Type</option>
+            <option value="Smartphone">Smartphone</option>
+            <option value="Tablet">Tablet</option>
+            <option value="Camera">Camera</option>
+        </select>
+
+        <label for="ownerName">Owner Name:</label>
+        <input type="text" id="ownerName" required>
+
+        <label for="batteryStatus">Battery Status (0-100%):</label>
+        <input type="number" id="batteryStatus" min="0" max="100" required>
+
+        <button type="submit">Add Device</button>
     </form>
 
     <script>
-        document.getElementById('deviceForm').addEventListener('submit', function(event) {
+        let devices = [];
+
+        function addDevice(event) {
             event.preventDefault();
 
-            // Get form values
             const deviceName = document.getElementById('deviceName').value;
             const deviceType = document.getElementById('deviceType').value;
             const ownerName = document.getElementById('ownerName').value;
             const batteryStatus = document.getElementById('batteryStatus').value;
 
-            // Create a new row
-            const table = document.getElementById('deviceTable').getElementsByTagName('tbody')[0];
-            const newRow = table.insertRow();
+            const newDevice = {
+                deviceName,
+                deviceType,
+                ownerName,
+                batteryStatus
+            };
 
-            // Insert cells
-            const cell1 = newRow.insertCell(0);
-            const cell2 = newRow.insertCell(1);
-            const cell3 = newRow.insertCell(2);
-            const cell4 = newRow.insertCell(3);
+            devices.push(newDevice);
+            updateDeviceTable();
+            event.target.reset();
+        }
 
-            // Add values to cells
-            cell1.innerHTML = deviceName;
-            cell2.innerHTML = deviceType;
-            cell3.innerHTML = ownerName;
-            cell4.innerHTML = batteryStatus;
+        function updateDeviceTable() {
+            const tableBody = document.querySelector('#deviceTable tbody');
+            tableBody.innerHTML = '';
 
-            // Clear form
-            document.getElementById('deviceForm').reset();
-        });
+            devices.forEach(device => {
+                const row = tableBody.insertRow();
+                row.insertCell(0).textContent = device.deviceName;
+                row.insertCell(1).textContent = device.deviceType;
+                row.insertCell(2).textContent = device.ownerName;
+                row.insertCell(3).textContent = `${device.batteryStatus}%`;
+            });
+        }
+
+        document.getElementById('deviceForm').addEventListener('submit', addDevice);
+
+        updateDeviceTable();
     </script>
 </body>
 </html>

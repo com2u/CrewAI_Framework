@@ -14,5 +14,5 @@ Create a web page for a device management app. The page should maintain differen
 Mark an empty device in red and a device with power in green. Make sure it will stay red when 0% are reached.
 Provide the possibility to order the device table by Device Name, DeviceType, Owner Name, Battery Status.
 Add to the existing devices types: Laptop, Car, Powerbank. Provide a matching icon
-Store the device settings in the local browser store. Load the devices from the browser store with the page. Make sure it will work when the store is empty and nothing was created (e.g. first start).
+Let a spinner run to visualize that continuous update is working in the background
 

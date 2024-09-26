@@ -1,6 +1,3 @@
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,94 +7,139 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
         }
         h1 {
             text-align: center;
+            color: #333;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
-        }
-        table, th, td {
-            border: 1px solid black;
+            background-color: white;
         }
         th, td {
-            padding: 10px;
+            border: 1px solid #ddd;
+            padding: 12px;
             text-align: left;
         }
-        form {
-            max-width: 600px;
-            margin: 0 auto;
+        th {
+            background-color: #f2f2f2;
+            cursor: pointer;
         }
-        form div {
-            margin-bottom: 10px;
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .battery-status {
+            width: 100%;
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .battery-level {
+            height: 100%;
+            transition: width 0.5s ease-in-out;
+        }
+        .form-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
         }
         label {
             display: block;
             margin-bottom: 5px;
+            font-weight: bold;
         }
-        input[type="text"], input[type="number"], select {
+        input, select {
             width: 100%;
             padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
             box-sizing: border-box;
         }
-        input[type="submit"] {
-            padding: 10px 20px;
+        button {
             background-color: #4CAF50;
             color: white;
+            padding: 10px 15px;
             border: none;
+            border-radius: 4px;
             cursor: pointer;
+            font-size: 16px;
         }
-        input[type="submit"]:hover {
+        button:hover {
             background-color: #45a049;
         }
-        .action-buttons {
-            display: flex;
-            gap: 10px;
+        .delete-btn {
+            background-color: #f44336;
         }
-        .action-buttons button {
-            padding: 5px 10px;
-            cursor: pointer;
+        .delete-btn:hover {
+            background-color: #d32f2f;
         }
-        .edit-button {
-            background-color: #FFA500;
-            color: white;
-            border: none;
+        .update-btn {
+            background-color: #2196F3;
         }
-        .delete-button {
-            background-color: #FF0000;
-            color: white;
-            border: none;
+        .update-btn:hover {
+            background-color: #1976D2;
         }
-        .progress-bar {
-            width: 100%;
-            background-color: #f3f3f3;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            overflow: hidden;
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
         }
-        .progress-bar-inner {
-            height: 20px;
-            background-color: #4CAF50;
-            text-align: center;
-            color: white;
-            line-height: 20px;
-        }
-        .battery-low {
-            background-color: #FF0000;
-        }
-        .battery-empty {
-            background-color: #FF0000;
-        }
-        .battery-full {
-            background-color: #4CAF50;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
     <h1>Device Management App</h1>
+    
+    <div class="form-container">
+        <h2>Add New Device</h2>
+        <form id="deviceForm">
+            <div class="form-group">
+                <label for="deviceName">Device Name:</label>
+                <input type="text" id="deviceName" required>
+            </div>
+            <div class="form-group">
+                <label for="deviceType">Device Type:</label>
+                <select id="deviceType" required>
+                    <option value="Smartphone">Smartphone</option>
+                    <option value="Tablet">Tablet</option>
+                    <option value="Camera">Camera</option>
+                    <option value="Laptop">Laptop</option>
+                    <option value="Car">Car</option>
+                    <option value="Powerbank">Powerbank</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="ownerName">Owner Name:</label>
+                <input type="text" id="ownerName" required>
+            </div>
+            <div class="form-group">
+                <label for="batteryStatus">Battery Status (0-100%):</label>
+                <input type="number" id="batteryStatus" min="0" max="100" required>
+            </div>
+            <button type="submit">Add Device</button>
+        </form>
+    </div>
+
+    <div class="spinner"></div>
+
     <table id="deviceTable">
         <thead>
             <tr>
@@ -108,200 +150,119 @@
                 <th>Actions</th>
             </tr>
         </thead>
-        <tbody>
-            <!-- Existing devices will be listed here -->
-        </tbody>
+        <tbody></tbody>
     </table>
-    <form id="deviceForm">
-        <div>
-            <label for="deviceName">Device Name:</label>
-            <input type="text" id="deviceName" name="deviceName" required>
-        </div>
-        <div>
-            <label for="deviceType">Device Type:</label>
-            <select id="deviceType" name="deviceType" required>
-                <option value="Smartphone">Smartphone</option>
-                <option value="Tablet">Tablet</option>
-                <option value="Camera">Camera</option>
-                <option value="Laptop">Laptop</option>
-                <option value="Car">Car</option>
-                <option value="Powerbank">Powerbank</option>
-            </select>
-        </div>
-        <div>
-            <label for="ownerName">Owner Name:</label>
-            <input type="text" id="ownerName" name="ownerName" required>
-        </div>
-        <div>
-            <label for="batteryStatus">Battery Status (%):</label>
-            <input type="number" id="batteryStatus" name="batteryStatus" min="0" max="100" required>
-        </div>
-        <div>
-            <input type="submit" value="Add Device">
-        </div>
-    </form>
 
     <script>
-        let devices = JSON.parse(localStorage.getItem('devices')) || [];
+        let devices = [];
+        const deviceIcons = {
+            'Smartphone': '📱',
+            'Tablet': '📟',
+            'Camera': '📷',
+            'Laptop': '💻',
+            'Car': '🚗',
+            'Powerbank': '🔋'
+        };
 
-        document.getElementById('deviceForm').addEventListener('submit', function(event) {
+        function addDevice(event) {
             event.preventDefault();
-
-            // Get form values
             const deviceName = document.getElementById('deviceName').value;
             const deviceType = document.getElementById('deviceType').value;
             const ownerName = document.getElementById('ownerName').value;
             const batteryStatus = parseInt(document.getElementById('batteryStatus').value);
 
-            // Create a new device object
-            const device = {
-                id: Date.now(),
-                deviceName,
-                deviceType,
-                ownerName,
-                batteryStatus
-            };
-
-            // Add device to the list
-            //devices.push(device);
-            localStorage.setItem('devices', JSON.stringify(devices));
-            addDeviceToTable(device);
-
-            // Clear form
-            document.getElementById('deviceForm').reset();
-        });
-
-        function addDeviceToTable(device) {
-            const table = document.getElementById('deviceTable').getElementsByTagName('tbody')[0];
-            const newRow = table.insertRow();
-
-            newRow.setAttribute('data-id', device.id);
-
-            // Insert cells
-            const cell1 = newRow.insertCell(0);
-            const cell2 = newRow.insertCell(1);
-            const cell3 = newRow.insertCell(2);
-            const cell4 = newRow.insertCell(3);
-            const cell5 = newRow.insertCell(4);
-
-            // Add values to cells
-            cell1.innerHTML = device.deviceName;
-            cell2.innerHTML = getDeviceIcon(device.deviceType) + ' ' + device.deviceType;
-            cell3.innerHTML = device.ownerName;
-
-            // Create progress bar for battery status
-            const progressBar = document.createElement('div');
-            progressBar.className = 'progress-bar';
-            const progressBarInner = document.createElement('div');
-            progressBarInner.className = 'progress-bar-inner';
-            progressBarInner.style.width = device.batteryStatus + '%';
-            progressBarInner.innerHTML = device.batteryStatus + '%';
-            progressBar.appendChild(progressBarInner);
-            cell4.appendChild(progressBar);
-
-            // Add action buttons
-            const actionButtons = document.createElement('div');
-            actionButtons.className = 'action-buttons';
-            const editButton = document.createElement('button');
-            editButton.className = 'edit-button';
-            editButton.innerHTML = 'Edit';
-            editButton.onclick = function() {
-                editDevice(device.id);
-            };
-            const deleteButton = document.createElement('button');
-            deleteButton.className = 'delete-button';
-            deleteButton.innerHTML = 'Delete';
-            deleteButton.onclick = function() {
-                deleteDevice(device.id);
-            };
-            actionButtons.appendChild(editButton);
-            actionButtons.appendChild(deleteButton);
-            cell5.appendChild(actionButtons);
-
-            // Start battery drain
-            drainBattery(device.id, progressBarInner);
+            const newDevice = { deviceName, deviceType, ownerName, batteryStatus };
+            devices.push(newDevice);
+            updateTable();
+            event.target.reset();
         }
 
-        function getDeviceIcon(deviceType) {
-            switch(deviceType) {
-                case 'Smartphone':
-                    return '📱';
-                case 'Tablet':
-                    return '📱';
-                case 'Camera':
-                    return '📷';
-                case 'Laptop':
-                    return '💻';
-                case 'Car':
-                    return '🚗';
-                case 'Powerbank':
-                    return '🔋';
-                default:
-                    return '';
-            }
+        function updateTable() {
+            const tableBody = document.querySelector('#deviceTable tbody');
+            tableBody.innerHTML = '';
+            devices.forEach((device, index) => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${device.deviceName}</td>
+                    <td>${deviceIcons[device.deviceType]} ${device.deviceType}</td>
+                    <td>${device.ownerName}</td>
+                    <td>
+                        <div class="battery-status">
+                            <div class="battery-level" style="width: ${device.batteryStatus}%; background-color: ${device.batteryStatus > 0 ? 'green' : 'red'}"></div>
+                        </div>
+                        ${device.batteryStatus}%
+                    </td>
+                    <td>
+                        <button class="update-btn" onclick="updateDevice(${index})">Update</button>
+                        <button class="delete-btn" onclick="deleteDevice(${index})">Delete</button>
+                    </td>
+                `;
+            });
         }
 
-        function editDevice(deviceId) {
-            const device = devices.find(d => d.id === deviceId);
+        function updateDevice(index) {
+            const device = devices[index];
             document.getElementById('deviceName').value = device.deviceName;
             document.getElementById('deviceType').value = device.deviceType;
             document.getElementById('ownerName').value = device.ownerName;
             document.getElementById('batteryStatus').value = device.batteryStatus;
-
-            // Remove the device from the list and table
-            devices = devices.filter(d => d.id !== deviceId);
-            localStorage.setItem('devices', JSON.stringify(devices));
-            const row = document.querySelector(`tr[data-id='${deviceId}']`);
-            row.parentNode.removeChild(row);
+            devices.splice(index, 1);
+            updateTable();
         }
 
-        function deleteDevice(deviceId) {
-            // Remove the device from the list and table
-            devices = devices.filter(d => d.id !== deviceId);
-            localStorage.setItem('devices', JSON.stringify(devices));
-            const row = document.querySelector(`tr[data-id='${deviceId}']`);
-            row.parentNode.removeChild(row);
+        function deleteDevice(index) {
+            devices.splice(index, 1);
+            updateTable();
         }
 
-        function drainBattery(deviceId, progressBarInner) {
-            const interval = setInterval(() => {
-                //const device = devices.find(d => d.id === deviceId);
-                if (device.batteryStatus > 0) {
-                    device.batteryStatus -= 1;
-                    progressBarInner.style.width = device.batteryStatus + '%';
-                    progressBarInner.innerHTML = device.batteryStatus + '%';
-                    if (device.batteryStatus === 0) {
-                        progressBarInner.classList.add('battery-low');
+        function sortTable(n) {
+            const table = document.getElementById("deviceTable");
+            let rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+            switching = true;
+            dir = "asc";
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("TD")[n];
+                    y = rows[i + 1].getElementsByTagName("TD")[n];
+                    if (dir == "asc") {
+                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (dir == "desc") {
+                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
                     }
-                } else {
-                    clearInterval(interval);
                 }
-            }, 1000);
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchcount++;
+                } else {
+                    if (switchcount == 0 && dir == "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
         }
 
-        function sortTable(columnIndex) {
-            const table = document.getElementById('deviceTable');
-            const tbody = table.getElementsByTagName('tbody')[0];
-            const rows = Array.from(tbody.getElementsByTagName('tr'));
-
-            rows.sort((a, b) => {
-                const cellA = a.getElementsByTagName('td')[columnIndex].innerText;
-                const cellB = b.getElementsByTagName('td')[columnIndex].innerText;
-
-                if (columnIndex === 3) { // Battery Status column
-                    return parseInt(cellA) - parseInt(cellB);
-                } else {
-                    return cellA.localeCompare(cellB);
+        function updateBatteryStatus() {
+            devices.forEach(device => {
+                if (device.batteryStatus > 0) {
+                    device.batteryStatus--;
                 }
             });
-
-            rows.forEach(row => tbody.appendChild(row));
+            updateTable();
         }
 
-        // Load devices from local storage on page load
-        //window.onload = function() {
-        //    devices.forEach(device => addDeviceToTable(device));
-        //};
+        document.getElementById('deviceForm').addEventListener('submit', addDevice);
+        setInterval(updateBatteryStatus, 1000);
     </script>
 </body>
 </html>

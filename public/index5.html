@@ -1,6 +1,3 @@
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,88 +7,98 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
         }
-        h1 {
+        h1, h2 {
             text-align: center;
+            color: #333;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
-        }
-        table, th, td {
-            border: 1px solid black;
+            background-color: #fff;
         }
         th, td {
-            padding: 10px;
+            border: 1px solid #ddd;
+            padding: 12px;
             text-align: left;
         }
-        form {
-            max-width: 600px;
-            margin: 0 auto;
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
         }
-        form div {
-            margin-bottom: 10px;
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
         }
         label {
             display: block;
             margin-bottom: 5px;
+            font-weight: bold;
         }
-        input[type="text"], input[type="number"], select {
+        input, select {
             width: 100%;
             padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
             box-sizing: border-box;
         }
-        input[type="submit"] {
-            padding: 10px 20px;
+        button {
             background-color: #4CAF50;
             color: white;
+            padding: 10px 15px;
             border: none;
+            border-radius: 4px;
             cursor: pointer;
+            font-size: 16px;
         }
-        input[type="submit"]:hover {
+        button:hover {
             background-color: #45a049;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-top: -10px;
+            margin-bottom: 10px;
         }
         .action-buttons {
             display: flex;
-            gap: 10px;
+            justify-content: space-between;
         }
-        .action-buttons button {
-            padding: 5px 10px;
-            cursor: pointer;
+        .update-btn {
+            background-color: #2196F3;
         }
-        .edit-button {
-            background-color: #FFA500;
-            color: white;
-            border: none;
+        .update-btn:hover {
+            background-color: #0b7dda;
         }
-        .delete-button {
-            background-color: #FF0000;
-            color: white;
-            border: none;
+        .delete-btn {
+            background-color: #f44336;
         }
-        .progress-bar {
+        .delete-btn:hover {
+            background-color: #da190b;
+        }
+        .battery-status {
             width: 100%;
-            background-color: #f3f3f3;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
             overflow: hidden;
         }
-        .progress-bar-inner {
+        .battery-level {
             height: 20px;
-            background-color: #4CAF50;
-            text-align: center;
-            color: white;
-            line-height: 20px;
-        }
-        .battery-low {
-            background-color: #FF0000;
+            transition: width 0.5s ease-in-out;
         }
     </style>
 </head>
 <body>
     <h1>Device Management App</h1>
+
     <table id="deviceTable">
         <thead>
             <tr>
@@ -103,121 +110,139 @@
             </tr>
         </thead>
         <tbody>
-            <!-- Existing devices will be listed here -->
         </tbody>
     </table>
+
     <form id="deviceForm">
-        <div>
-            <label for="deviceName">Device Name:</label>
-            <input type="text" id="deviceName" name="deviceName" required>
-        </div>
-        <div>
-            <label for="deviceType">Device Type:</label>
-            <select id="deviceType" name="deviceType" required>
-                <option value="Smartphone">Smartphone</option>
-                <option value="Tablet">Tablet</option>
-                <option value="Camera">Camera</option>
-            </select>
-        </div>
-        <div>
-            <label for="ownerName">Owner Name:</label>
-            <input type="text" id="ownerName" name="ownerName" required>
-        </div>
-        <div>
-            <label for="batteryStatus">Battery Status (%):</label>
-            <input type="number" id="batteryStatus" name="batteryStatus" min="0" max="100" required>
-        </div>
-        <div>
-            <input type="submit" value="Add Device">
+        <h2>Add New Device</h2>
+        <label for="deviceName">Device Name:</label>
+        <input type="text" id="deviceName" required>
+        <div id="deviceNameError" class="error"></div>
+
+        <label for="deviceType">Device Type:</label>
+        <select id="deviceType" required>
+            <option value="">Select Device Type</option>
+            <option value="Smartphone">Smartphone</option>
+            <option value="Tablet">Tablet</option>
+            <option value="Camera">Camera</option>
+        </select>
+        <div id="deviceTypeError" class="error"></div>
+
+        <label for="ownerName">Owner Name:</label>
+        <input type="text" id="ownerName" required>
+        <div id="ownerNameError" class="error"></div>
+
+        <label for="batteryStatus">Battery Status (0-100%):</label>
+        <input type="number" id="batteryStatus" min="0" max="100" required>
+        <div id="batteryStatusError" class="error"></div>
+
+        <button type="submit">Add Device</button>
+    </form>
+
+    <form id="updateForm" style="display: none;">
+        <h2>Update Device</h2>
+        <input type="hidden" id="updateIndex">
+        <label for="updateDeviceName">Device Name:</label>
+        <input type="text" id="updateDeviceName" required>
+        <div id="updateDeviceNameError" class="error"></div>
+
+        <label for="updateDeviceType">Device Type:</label>
+        <select id="updateDeviceType" required>
+            <option value="">Select Device Type</option>
+            <option value="Smartphone">Smartphone</option>
+            <option value="Tablet">Tablet</option>
+            <option value="Camera">Camera</option>
+        </select>
+        <div id="updateDeviceTypeError" class="error"></div>
+
+        <label for="updateOwnerName">Owner Name:</label>
+        <input type="text" id="updateOwnerName" required>
+        <div id="updateOwnerNameError" class="error"></div>
+
+        <label for="updateBatteryStatus">Battery Status (0-100%):</label>
+        <input type="number" id="updateBatteryStatus" min="0" max="100" required>
+        <div id="updateBatteryStatusError" class="error"></div>
+
+        <div class="action-buttons">
+            <button type="submit" class="update-btn">Update Device</button>
+            <button type="button" onclick="cancelUpdate()">Cancel</button>
         </div>
     </form>
 
     <script>
-        let devices = [];
+        let devices = JSON.parse(localStorage.getItem('devices')) || [];
 
-        document.getElementById('deviceForm').addEventListener('submit', function(event) {
+        function addDevice(event) {
             event.preventDefault();
 
-            // Get form values
+            if (!validateForm('deviceForm')) {
+                return;
+            }
+
             const deviceName = document.getElementById('deviceName').value;
             const deviceType = document.getElementById('deviceType').value;
             const ownerName = document.getElementById('ownerName').value;
             const batteryStatus = parseInt(document.getElementById('batteryStatus').value);
 
-            // Create a new device object
-            const device = {
-                id: Date.now(),
+            const newDevice = {
                 deviceName,
                 deviceType,
                 ownerName,
                 batteryStatus
             };
 
-            // Add device to the list
-            devices.push(device);
-            addDeviceToTable(device);
+            devices.push(newDevice);
+            updateDeviceTable();
+            saveToLocalStorage();
+            event.target.reset();
+        }
 
-            // Clear form
-            document.getElementById('deviceForm').reset();
-        });
+        function updateDeviceTable() {
+            const tableBody = document.querySelector('#deviceTable tbody');
+            tableBody.innerHTML = '';
 
-        function addDeviceToTable(device) {
-            const table = document.getElementById('deviceTable').getElementsByTagName('tbody')[0];
-            const newRow = table.insertRow();
+            devices.forEach((device, index) => {
+                const row = tableBody.insertRow();
+                row.insertCell(0).textContent = device.deviceName;
+                
+                const typeCell = row.insertCell(1);
+                const deviceIcon = getDeviceIcon(device.deviceType);
+                typeCell.innerHTML = `${deviceIcon} ${device.deviceType}`;
+                
+                row.insertCell(2).textContent = device.ownerName;
+                
+                const batteryCell = row.insertCell(3);
+                const batteryStatus = document.createElement('div');
+                batteryStatus.className = 'battery-status';
+                const batteryLevel = document.createElement('div');
+                batteryLevel.className = 'battery-level';
+                batteryLevel.style.width = `${device.batteryStatus}%`;
+                batteryLevel.style.backgroundColor = getBatteryColor(device.batteryStatus);
+                batteryStatus.appendChild(batteryLevel);
+                batteryCell.appendChild(batteryStatus);
+                batteryCell.appendChild(document.createTextNode(`${device.batteryStatus}%`));
 
-            newRow.setAttribute('data-id', device.id);
+                const actionsCell = row.insertCell(4);
+                const updateButton = document.createElement('button');
+                updateButton.textContent = 'Update';
+                updateButton.className = 'update-btn';
+                updateButton.onclick = () => showUpdateForm(index);
+                actionsCell.appendChild(updateButton);
 
-            // Insert cells
-            const cell1 = newRow.insertCell(0);
-            const cell2 = newRow.insertCell(1);
-            const cell3 = newRow.insertCell(2);
-            const cell4 = newRow.insertCell(3);
-            const cell5 = newRow.insertCell(4);
-
-            // Add values to cells
-            cell1.innerHTML = device.deviceName;
-            cell2.innerHTML = getDeviceIcon(device.deviceType) + ' ' + device.deviceType;
-            cell3.innerHTML = device.ownerName;
-
-            // Create progress bar for battery status
-            const progressBar = document.createElement('div');
-            progressBar.className = 'progress-bar';
-            const progressBarInner = document.createElement('div');
-            progressBarInner.className = 'progress-bar-inner';
-            progressBarInner.style.width = device.batteryStatus + '%';
-            progressBarInner.innerHTML = device.batteryStatus + '%';
-            progressBar.appendChild(progressBarInner);
-            cell4.appendChild(progressBar);
-
-            // Add action buttons
-            const actionButtons = document.createElement('div');
-            actionButtons.className = 'action-buttons';
-            const editButton = document.createElement('button');
-            editButton.className = 'edit-button';
-            editButton.innerHTML = 'Edit';
-            editButton.onclick = function() {
-                editDevice(device.id);
-            };
-            const deleteButton = document.createElement('button');
-            deleteButton.className = 'delete-button';
-            deleteButton.innerHTML = 'Delete';
-            deleteButton.onclick = function() {
-                deleteDevice(device.id);
-            };
-            actionButtons.appendChild(editButton);
-            actionButtons.appendChild(deleteButton);
-            cell5.appendChild(actionButtons);
-
-            // Start battery drain
-            drainBattery(device.id, progressBarInner);
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.className = 'delete-btn';
+                deleteButton.onclick = () => deleteDevice(index);
+                actionsCell.appendChild(deleteButton);
+            });
         }
 
         function getDeviceIcon(deviceType) {
-            switch(deviceType) {
+            switch (deviceType) {
                 case 'Smartphone':
                     return '📱';
                 case 'Tablet':
-                    return '📱';
+                    return '📟';
                 case 'Camera':
                     return '📷';
                 default:
@@ -225,41 +250,116 @@
             }
         }
 
-        function editDevice(deviceId) {
-            const device = devices.find(d => d.id === deviceId);
-            document.getElementById('deviceName').value = device.deviceName;
-            document.getElementById('deviceType').value = device.deviceType;
-            document.getElementById('ownerName').value = device.ownerName;
-            document.getElementById('batteryStatus').value = device.batteryStatus;
-
-            // Remove the device from the list and table
-            devices = devices.filter(d => d.id !== deviceId);
-            const row = document.querySelector(`tr[data-id='${deviceId}']`);
-            row.parentNode.removeChild(row);
+        function getBatteryColor(batteryStatus) {
+            if (batteryStatus === 0) {
+                return '#F44336';
+            } else if (batteryStatus <= 20) {
+                return '#FF9800';
+            } else {
+                return '#4CAF50';
+            }
         }
 
-        function deleteDevice(deviceId) {
-            // Remove the device from the list and table
-            devices = devices.filter(d => d.id !== deviceId);
-            const row = document.querySelector(`tr[data-id='${deviceId}']`);
-            row.parentNode.removeChild(row);
+        function showUpdateForm(index) {
+            const device = devices[index];
+            document.getElementById('updateIndex').value = index;
+            document.getElementById('updateDeviceName').value = device.deviceName;
+            document.getElementById('updateDeviceType').value = device.deviceType;
+            document.getElementById('updateOwnerName').value = device.ownerName;
+            document.getElementById('updateBatteryStatus').value = device.batteryStatus;
+
+            document.getElementById('deviceForm').style.display = 'none';
+            document.getElementById('updateForm').style.display = 'block';
         }
 
-        function drainBattery(deviceId, progressBarInner) {
-            const interval = setInterval(() => {
-                const device = devices.find(d => d.id === deviceId);
-                if (device.batteryStatus > 0) {
-                    device.batteryStatus -= 1;
-                    progressBarInner.style.width = device.batteryStatus + '%';
-                    progressBarInner.innerHTML = device.batteryStatus + '%';
-                    if (device.batteryStatus === 0) {
-                        progressBarInner.classList.add('battery-low');
-                    }
-                } else {
-                    clearInterval(interval);
+        function updateDevice(event) {
+            event.preventDefault();
+
+            if (!validateForm('updateForm')) {
+                return;
+            }
+
+            const index = document.getElementById('updateIndex').value;
+            const deviceName = document.getElementById('updateDeviceName').value;
+            const deviceType = document.getElementById('updateDeviceType').value;
+            const ownerName = document.getElementById('updateOwnerName').value;
+            const batteryStatus = parseInt(document.getElementById('updateBatteryStatus').value);
+
+            devices[index] = {
+                deviceName,
+                deviceType,
+                ownerName,
+                batteryStatus
+            };
+
+            updateDeviceTable();
+            saveToLocalStorage();
+            cancelUpdate();
+        }
+
+        function cancelUpdate() {
+            document.getElementById('deviceForm').style.display = 'block';
+            document.getElementById('updateForm').style.display = 'none';
+            document.getElementById('updateForm').reset();
+        }
+
+        function deleteDevice(index) {
+            if (confirm('Are you sure you want to delete this device?')) {
+                devices.splice(index, 1);
+                updateDeviceTable();
+                saveToLocalStorage();
+            }
+        }
+
+        function validateForm(formId) {
+            const form = document.getElementById(formId);
+            let isValid = true;
+
+            form.querySelectorAll('input, select').forEach(element => {
+                const errorElement = document.getElementById(element.id + 'Error');
+                if (errorElement) {
+                    errorElement.textContent = '';
                 }
-            }, 1000);
+
+                if (!element.value) {
+                    isValid = false;
+                    if (errorElement) {
+                        errorElement.textContent = 'This field is required.';
+                    }
+                }
+
+                if (element.id.includes('batteryStatus')) {
+                    const value = parseInt(element.value);
+                    if (isNaN(value) || value < 0 || value > 100) {
+                        isValid = false;
+                        if (errorElement) {
+                            errorElement.textContent = 'Battery status must be between 0 and 100.';
+                        }
+                    }
+                }
+            });
+
+            return isValid;
         }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('devices', JSON.stringify(devices));
+        }
+
+        function decreaseBatteryStatus() {
+            devices = devices.map(device => ({
+                ...device,
+                batteryStatus: Math.max(0, device.batteryStatus - 1)
+            }));
+            updateDeviceTable();
+            saveToLocalStorage();
+        }
+
+        document.getElementById('deviceForm').addEventListener('submit', addDevice);
+        document.getElementById('updateForm').addEventListener('submit', updateDevice);
+
+        updateDeviceTable();
+        setInterval(decreaseBatteryStatus, 1000);
     </script>
 </body>
 </html>
