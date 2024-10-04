@@ -6,6 +6,7 @@ from langchain_community.llms import Ollama
 #from langchain_anthropic import ChatAnthropic
 #from llama_index.llms.openrouter import OpenRouter
 from CalculatorTool import calculate, code, requirement
+from gitTool import GitTool
 
 developmentProjectSubTask = [
     """Create a web page for a device management app. The page should maintain different devices in a web page. 
@@ -48,6 +49,9 @@ except KeyError:
 # llama31 = ChatOpenAI(model="meta-llama/llama-3-8b-instruct:extended", base_url="https://openrouter.ai/api/v1", os.getenv("OPENROUTER_API_KEY"))
 # llama31 = ChatOpenAI(model="o1-preview", base_url="https://openrouter.ai/api/v1", os.getenv("OPENROUTER_API_KEY"))
 
+
+# meta-llama/llama-3.2-3b-instruct
+# anthropic/claude-3.5-sonnet
 openRouter = ChatOpenAI(
   model="anthropic/claude-3.5-sonnet",
   openai_api_key = os.getenv("OPENROUTER_API_KEY"),
@@ -137,6 +141,20 @@ test_agent = Agent(
     allow_delegation=False,
     #tools=[requirement],
     verbose=True
+)
+
+github_agent = Agent(
+    role="GitHub Manager",
+    goal="Commit and push code changes with meaningful commit messages",
+    backstory="You are an experienced version control expert who ensures code changes are properly documented and committed.",
+    tools=[GitTool()],
+    verbose=True
+)
+
+commit_task = Task(
+    description="Review the code changes, create a meaningful commit message, and commit the changes.",
+    expected_output="A confirmation that the changes have been committed with the generated commit message.",
+    agent=github_agent
 )
 
 managementTask = Task(
@@ -257,6 +275,11 @@ def crewLoop(developmentProject, managementTask, codingTask, crew):
         result = crew.kickoff()
         implementation = ""
         cleanupSourceCode(loop)
+        
+        # Add commit task after each development cycle
+        commit_task.description = f"Review the changes made in development cycle {loop} and create a meaningful commit message."
+        commit_result = github_agent.execute_task(commit_task)
+        print(f"Commit result: {commit_result}")        
 
     return result
 
