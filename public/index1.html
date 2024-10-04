@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Management App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        form {
+            display: grid;
+            gap: 10px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Device Management App</h1>
+
+    <h2>Existing Devices</h2>
+    <table id="deviceTable">
+        <thead>
+            <tr>
+                <th>Device Name</th>
+                <th>Device Type</th>
+                <th>Owner Name</th>
+                <th>Battery Status</th>
+            </tr>
+        </thead>
+        <tbody id="deviceTableBody">
+        </tbody>
+    </table>
+
+    <h2>Add New Device</h2>
+    <form id="addDeviceForm">
+        <label for="deviceName">Device Name:</label>
+        <input type="text" id="deviceName" required>
+
+        <label for="deviceType">Device Type:</label>
+        <select id="deviceType" required>
+            <option value="">Select Device Type</option>
+            <option value="Smartphone">Smartphone</option>
+            <option value="Tablet">Tablet</option>
+            <option value="Camera">Camera</option>
+        </select>
+
+        <label for="ownerName">Owner Name:</label>
+        <input type="text" id="ownerName" required>
+
+        <label for="batteryStatus">Battery Status (0-100%):</label>
+        <input type="number" id="batteryStatus" min="0" max="100" required>
+
+        <button type="submit">Add Device</button>
+    </form>
+
+    <script>
+        let devices = [];
+
+        function renderDeviceTable() {
+            const tableBody = document.getElementById('deviceTableBody');
+            tableBody.innerHTML = '';
+
+            devices.forEach(device => {
+                const row = tableBody.insertRow();
+                row.insertCell(0).textContent = device.name;
+                row.insertCell(1).textContent = device.type;
+                row.insertCell(2).textContent = device.owner;
+                row.insertCell(3).textContent = `${device.battery}%`;
+            });
+        }
+
+        function addDevice(event) {
+            event.preventDefault();
+
+            const deviceName = document.getElementById('deviceName').value;
+            const deviceType = document.getElementById('deviceType').value;
+            const ownerName = document.getElementById('ownerName').value;
+            const batteryStatus = document.getElementById('batteryStatus').value;
+
+            const newDevice = {
+                name: deviceName,
+                type: deviceType,
+                owner: ownerName,
+                battery: parseInt(batteryStatus)
+            };
+
+            devices.push(newDevice);
+            renderDeviceTable();
+
+            event.target.reset();
+        }
+
+        document.getElementById('addDeviceForm').addEventListener('submit', addDevice);
+
+        renderDeviceTable();
+    </script>
+</body>
+</html>

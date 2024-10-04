@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Management App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        body.dark-mode {
+            background-color: #333;
+            color: #fff;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            cursor: pointer;
+        }
+        th:hover {
+            background-color: #e0e0e0;
+        }
+        form {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        .action-buttons button {
+            flex: 1;
+        }
+        .update-form {
+            display: none;
+        }
+        .battery-status {
+            width: 100%;
+            height: 20px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .battery-level {
+            height: 100%;
+            transition: width 0.5s ease-in-out;
+        }
+        .battery-full {
+            background-color: #4CAF50;
+        }
+        .battery-empty {
+            background-color: #f44336;
+        }
+        .device-icon {
+            font-size: 1.5em;
+            margin-right: 5px;
+        }
+        #darkModeToggle {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+        }
+        #searchInput {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        #batteryChart {
+            width: 100%;
+            height: 300px;
+            margin-top: 20px;
+        }
+        @media (max-width: 600px) {
+            table, tr, td {
+                display: block;
+            }
+            th {
+                display: none;
+            }
+            tr {
+                margin-bottom: 10px;
+            }
+            td {
+                border: none;
+                position: relative;
+                padding-left: 50%;
+            }
+            td:before {
+                content: attr(data-label);
+                position: absolute;
+                left: 6px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                font-weight: bold;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button id="darkModeToggle">Toggle Dark Mode</button>
+    <h1>Device Management App</h1>
+
+    <input type="text" id="searchInput" placeholder="Search devices...">
+
+    <h2>Existing Devices</h2>
+    <table id="deviceTable">
+        <thead>
+            <tr>
+                <th onclick="sortTable(0)">Device Name</th>
+                <th onclick="sortTable(1)">Device Type</th>
+                <th onclick="sortTable(2)">Owner Name</th>
+                <th onclick="sortTable(3)">Battery Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="deviceTableBody">
+        </tbody>
+    </table>
+
+    <h2>Add New Device</h2>
+    <form id="addDeviceForm">
+        <label for="deviceName">Device Name:</label>
+        <input type="text" id="deviceName" required>
+
+        <label for="deviceType">Device Type:</label>
+        <select id="deviceType" required>
+            <option value="">Select Device Type</option>
+            <option value="Smartphone">Smartphone</option>
+            <option value="Tablet">Tablet</option>
+            <option value="Camera">Camera</option>
+            <option value="Laptop">Laptop</option>
+            <option value="Car">Car</option>
+            <option value="Powerbank">Powerbank</option>
+        </select>
+
+        <label for="ownerName">Owner Name:</label>
+        <input type="text" id="ownerName" required>
+
+        <label for="batteryStatus">Battery Status (0-100%):</label>
+        <input type="number" id="batteryStatus" min="0" max="100" required>
+
+        <button type="submit">Add Device</button>
+    </form>
+
+    <div id="updateFormContainer" class="update-form">
+        <h2>Update Device</h2>
+        <form id="updateDeviceForm">
+            <input type="hidden" id="updateIndex">
+            <label for="updateDeviceName">Device Name:</label>
+            <input type="text" id="updateDeviceName" required>
+
+            <label for="updateDeviceType">Device Type:</label>
+            <select id="updateDeviceType" required>
+                <option value="">Select Device Type</option>
+                <option value="Smartphone">Smartphone</option>
+                <option value="Tablet">Tablet</option>
+                <option value="Camera">Camera</option>
+                <option value="Laptop">Laptop</option>
+                <option value="Car">Car</option>
+                <option value="Powerbank">Powerbank</option>
+            </select>
+
+            <label for="updateOwnerName">Owner Name:</label>
+            <input type="text" id="updateOwnerName" required>
+
+            <label for="updateBatteryStatus">Battery Status (0-100%):</label>
+            <input type="number" id="updateBatteryStatus" min="0" max="100" required>
+
+            <button type="submit">Update Device</button>
+        </form>
+    </div>
+
+    <button id="exportButton">Export Devices</button>
+    <input type="file" id="importInput" accept=".json" style="display: none;">
+    <button id="importButton">Import Devices</button>
+
+    <div id="batteryChart"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let devices = [];
+        let chart;
+
+        function getDeviceIcon(type) {
+            switch (type) {
+                case 'Smartphone': return '📱';
+                case 'Tablet': return '📟';
+                case 'Camera': return '📷';
+                case 'Laptop': return '💻';
+                case 'Car': return '🚗';
+                case 'Powerbank': return '🔋';
+                default: return '';
+            }
+        }
+
+        function renderDeviceTable() {
+            const tableBody = document.getElementById('deviceTableBody');
+            tableBody.innerHTML = '';
+
+            devices.forEach((device, index) => {
+                const row = tableBody.insertRow();
+                row.insertCell(0).innerHTML = `<td data-label="Device Name">${sanitizeInput(device.name)}</td>`;
+                row.insertCell(1).innerHTML = `<td data-label="Device Type"><span class="device-icon">${getDeviceIcon(device.type)}</span>${sanitizeInput(device.type)}</td>`;
+                row.insertCell(2).innerHTML = `<td data-label="Owner Name">${sanitizeInput(device.owner)}</td>`;
+                row.insertCell(3).innerHTML = `
+                    <td data-label="Battery Status">
+                        ${device.battery}%
+                        <div class="battery-status">
+                            <div class="battery-level ${device.battery > 0 ? 'battery-full' : 'battery-empty'}" style="width: ${device.battery}%;"></div>
+                        </div>
+                    </td>
+                `;
+                
+                const actionsCell = row.insertCell(4);
+                actionsCell.innerHTML = `
+                    <div class="action-buttons">
+                        <button onclick="showUpdateForm(${index})">Update</button>
+                        <button onclick="deleteDevice(${index})">Delete</button>
+                    </div>
+                `;
+            });
+
+            updateBatteryChart();
+        }
+
+        function addDevice(event) {
+            event.preventDefault();
+
+            const deviceName = document.getElementById('deviceName').value;
+            const deviceType = document.getElementById('deviceType').value;
+            const ownerName = document.getElementById('ownerName').value;
+            const batteryStatus = document.getElementById('batteryStatus').value;
+
+            if (!validateInput(deviceName, deviceType, ownerName, batteryStatus)) {
+                alert('Please fill all fields correctly.');
+                return;
+            }
+
+            const newDevice = {
+                name: deviceName,
+                type: deviceType,
+                owner: ownerName,
+                battery: parseInt(batteryStatus)
+            };
+
+            devices.push(newDevice);
+            renderDeviceTable();
+            saveToLocalStorage();
+
+            event.target.reset();
+        }
+
+        function showUpdateForm(index) {
+            const device = devices[index];
+            document.getElementById('updateIndex').value = index;
+            document.getElementById('updateDeviceName').value = device.name;
+            document.getElementById('updateDeviceType').value = device.type;
+            document.getElementById('updateOwnerName').value = device.owner;
+            document.getElementById('updateBatteryStatus').value = device.battery;
+
+            document.getElementById('updateFormContainer').style.display = 'block';
+        }
+
+        function updateDevice(event) {
+            event.preventDefault();
+
+            const index = document.getElementById('updateIndex').value;
+            const deviceName = document.getElementById('updateDeviceName').value;
+            const deviceType = document.getElementById('updateDeviceType').value;
+            const ownerName = document.getElementById('updateOwnerName').value;
+            const batteryStatus = document.getElementById('updateBatteryStatus').value;
+
+            if (!validateInput(deviceName, deviceType, ownerName, batteryStatus)) {
+                alert('Please fill all fields correctly.');
+                return;
+            }
+
+            if (confirm('Are you sure you want to update this device?')) {
+                devices[index] = {
+                    name: deviceName,
+                    type: deviceType,
+                    owner: ownerName,
+                    battery: parseInt(batteryStatus)
+                };
+
+                renderDeviceTable();
+                saveToLocalStorage();
+                document.getElementById('updateFormContainer').style.display = 'none';
+            }
+        }
+
+        function deleteDevice(index) {
+            if (confirm('Are you sure you want to delete this device?')) {
+                devices.splice(index, 1);
+                renderDeviceTable();
+                saveToLocalStorage();
+            }
+        }
+
+        function decreaseBatteryStatus() {
+            devices.forEach(device => {
+                if (device.battery > 0) {
+                    device.battery -= 1;
+                }
+            });
+            renderDeviceTable();
+            saveToLocalStorage();
+        }
+
+        function sortTable(columnIndex) {
+            const sortOrder = columnIndex === 3 ? -1 : 1;
+            devices.sort((a, b) => {
+                const valueA = Object.values(a)[columnIndex];
+                const valueB = Object.values(b)[columnIndex];
+                if (valueA < valueB) return -1 * sortOrder;
+                if (valueA > valueB) return 1 * sortOrder;
+                return 0;
+            });
+            renderDeviceTable();
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('devices', JSON.stringify(devices));
+        }
+
+        function loadFromLocalStorage() {
+            const storedDevices = localStorage.getItem('devices');
+            if (storedDevices) {
+                devices = JSON.parse(storedDevices);
+                renderDeviceTable();
+            }
+        }
+
+        function validateInput(name, type, owner, battery) {
+            return name.trim() !== '' && type !== '' && owner.trim() !== '' && battery >= 0 && battery <= 100;
+        }
+
+        function sanitizeInput(input) {
+            const div = document.createElement('div');
+            div.textContent = input;
+            return div.innerHTML;
+        }
+
+        function searchDevices() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filteredDevices = devices.filter(device => 
+                device.name.toLowerCase().includes(searchTerm) ||
+                device.type.toLowerCase().includes(searchTerm) ||
+                device.owner.toLowerCase().includes(searchTerm)
+            );
+            renderFilteredDevices(filteredDevices);
+        }
+
+        function renderFilteredDevices(filteredDevices) {
+            const tableBody = document.getElementById('deviceTableBody');
+            tableBody.innerHTML = '';
+
+            filteredDevices.forEach((device, index) => {
+                const row = tableBody.insertRow();
+                row.insertCell(0).innerHTML = `<td data-label="Device Name">${sanitizeInput(device.name)}</td>`;
+                row.insertCell(1).innerHTML = `<td data-label="Device Type"><span class="device-icon">${getDeviceIcon(device.type)}</span>${sanitizeInput(device.type)}</td>`;
+                row.insertCell(2).innerHTML = `<td data-label="Owner Name">${sanitizeInput(device.owner)}</td>`;
+                row.insertCell(3).innerHTML = `
+                    <td data-label="Battery Status">
+                        ${device.battery}%
+                        <div class="battery-status">
+                            <div class="battery-level ${device.battery > 0 ? 'battery-full' : 'battery-empty'}" style="width: ${device.battery}%;"></div>
+                        </div>
+                    </td>
+                `;
+                
+                const actionsCell = row.insertCell(4);
+                actionsCell.innerHTML = `
+                    <div class="action-buttons">
+                        <button onclick="showUpdateForm(${devices.indexOf(device)})">Update</button>
+                        <button onclick="deleteDevice(${devices.indexOf(device)})">Delete</button>
+                    </div>
+                `;
+            });
+        }
+
+        function exportDevices() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(devices));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "devices.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        function importDevices(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedDevices = JSON.parse(e.target.result);
+                    devices = importedDevices;
+                    renderDeviceTable();
+                    saveToLocalStorage();
+                    alert('Devices imported successfully!');
+                } catch (error) {
+                    alert('Error importing devices. Please check the file format.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function updateBatteryChart() {
+            const ctx = document.getElementById('batteryChart').getContext('2d');
+            const labels = devices.map(device => device.name);
+            const data = devices.map(device => device.battery);
+
+            if (chart) {
+                chart.destroy();
+            }
+
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Battery Status',
+                        data: data,
+                        backgroundColor: data.map(value => value > 0 ? 'rgba(75, 192, 192, 0.6)' : 'rgba(255, 99, 132, 0.6)'),
+                        borderColor: data.map(value => value > 0 ? 'rgba(75, 192, 192, 1)' : 'rgba(255, 99, 132, 1)'),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        document.getElementById('addDeviceForm').addEventListener('submit', addDevice);
+        document.getElementById('updateDeviceForm').addEventListener('submit', updateDevice);
+        document.getElementById('searchInput').addEventListener('input', searchDevices);
+        document.getElementById('exportButton').addEventListener('click', exportDevices);
+        document.getElementById('importButton').addEventListener('click', () => document.getElementById('importInput').click());
+        document.getElementById('importInput').addEventListener('change', importDevices);
+        document.getElementById('darkModeToggle').addEventListener('click', toggleDarkMode);
+
+        loadFromLocalStorage();
+        setInterval(() => {
+            requestAnimationFrame(decreaseBatteryStatus);
+        }, 1000);
+    </script>
+</body>
+</html>
