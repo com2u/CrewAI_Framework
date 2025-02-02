@@ -135,5 +135,3 @@ class BrowsingTool(BaseTool):
         except RuntimeError:
             # No running event loop, use asyncio.run()
             return asyncio.run(run_async())
-        
-        
