@@ -1,102 +1,136 @@
-## CrewAI Framework
-### Overview
-The CrewAI Framework is an example designed to automate tasks using AI agents with the integration of various large language models (LLMs) such as OpenAI's GPT and others. The framework enables you to manage, configure, and process complex AI-driven workflows, utilizing APIs and environment configurations to interact with external LLM providers.
+# CrewAI Framework
 
-This document provides a guide on how to set up and use the framework, explaining the core components and their functionality.
+## Overview
+The CrewAI Framework is an innovative development automation system that orchestrates multiple AI agents to collaboratively develop software projects. Unlike traditional AI frameworks that use a single agent, this framework implements a "crew" of specialized AI agents, each with distinct roles and responsibilities in the development process.
 
-### Features
-Integrate multiple AI models (OpenAI, Llama, etc.) through API-based connections.
-Set up and configure tasks for AI agents using a simple and flexible interface.
-Extendable with tools like CalculatorTool for added computational capabilities.
-Environment-variable-driven configuration for easier setup and deployment.
-Requirements
-Python 3.8+
-Dependencies as listed in requirements.txt
-Environment variables for API keys (OpenAI, etc.)
-Environment Variables
-Make sure the following environment variables are set up in your .env file:
+## Key Features
+- **Multi-Agent Collaboration**: Implements a crew of specialized AI agents working together:
+  - Manager Agent: Oversees project requirements and coordinates development
+  - Coding Agent: Implements the actual code
+  - Code Review Agent: Reviews and suggests improvements
+  - UI/UX Agent: Focuses on user interface and experience
+  - Documentation Agent: Handles documentation
+  - Test Agent: Manages testing
+  - Browsing Agent: Validates implementations
 
-OPENAI_API_KEY: The API key for accessing OpenAI's models.
-OPENAI_MODEL_NAME: The model name to use from OpenAI.
-Other environment variables may be required depending on the specific models used.
+- **Sequential Process Workflow**: Automated development cycle where each agent contributes their expertise in a coordinated sequence
+- **Iterative Development**: Supports multiple development cycles with automatic file versioning and backups
+- **Configuration-Driven**: Easy setup through YAML configuration files for agents and tasks
+- **OpenRouter Integration**: Uses advanced language models through OpenRouter API
+- **Automated Code Management**: Handles code cleanup, backup creation, and file management
 
-### Installation
-Clone the repository.
+## Requirements
+- Python 3.8+
+- Dependencies listed in `requirements.txt`
+- OpenRouter API key for accessing AI models
 
+## Installation
+
+1. Clone the repository:
 ```bash
 git clone https://github.com/com2u/CrewAI_Framework
 cd CrewAI_Framework
 ```
-Install the required dependencies:
 
+2. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
-Set up the .env file with your API keys:
 
-
+3. Set up environment variables:
 ```bash
 cp .env.example .env
 ```
+Edit `.env` and add your OpenRouter API key:
+```
+OPENROUTER_API_KEY=your_api_key_here
+```
 
-# Fill in the required API keys in the .env file
-### Usage
-Running the Framework
-To start the CrewAI framework, simply execute the main.py script:
+## Creating Projects with CrewAI
 
+### 1. Define Requirements
+Create or modify `config/requirements.yaml` to define your development tasks:
+```yaml
+development_tasks:
+  - "Task 1 description"
+  - "Task 2 description"
+  # Add more tasks as needed
+```
 
+### 2. Configure Agents
+Adjust `config/agents.yaml` to customize agent behaviors:
+```yaml
+manager:
+  role: "Project Manager"
+  goal: "Ensure project requirements are met"
+  backstory: "Experienced in overseeing software projects"
+
+codeing_agent:
+  role: "Senior Software Developer"
+  goal: "Write efficient and maintainable code"
+  # ... configure other agents similarly
+```
+
+### 3. Run the Framework
+Execute the main script to start the development process:
 ```bash
-python main.py
-```
-Components
-1. Agents
-The Agent class represents individual AI agents responsible for executing tasks. Each agent is configured to interact with a specific LLM model. You can customize the models and behaviors using environment variables.
-
-2. Task
-Tasks are discrete units of work that agents will perform. They are defined programmatically in the framework and can range from simple text processing to more complex operations using external tools like CalculatorTool.
-
-3. Crew
-A crew is a collection of agents working together to perform larger workflows or complex tasks. The framework orchestrates multiple agents to collaborate on achieving a goal.
-
-4. Process
-The Process class manages task execution, directing agents to work on specific tasks as required.
-
-### Example Task Execution
-An example of executing a task might look like this:
-
-```Python
-from crewai import Agent, Task
-
-# Define a task
-task = Task(description="Calculate something complex")
-
-# Create an agent and assign the task
-agent = Agent(model="gpt-3.5-turbo")
-agent.assign_task(task)
-agent.execute()
+python WebCrewBrowsing.py
 ```
 
-This will use the specified model (gpt-3.5-turbo) to execute the task.
+The framework will:
+1. Load your requirements
+2. Initialize the AI agent crew
+3. Execute development tasks sequentially
+4. Generate and manage code files
+5. Create backups for each development iteration
 
-Extending the Framework
-The framework is designed to be extendable. You can add new models, tools, or tasks by modifying the relevant classes in the codebase.
+## Project Structure
+```
+CrewAI_Framework/
+├── config/                 # Configuration files
+│   ├── agents.yaml        # Agent definitions
+│   ├── requirements.yaml  # Project requirements
+│   └── tasks.yaml        # Task configurations
+├── markdown/              # Development artifacts
+├── public/               # Generated code output
+├── tools/                # Custom tools
+└── WebCrewBrowsing.py    # Main execution script
+```
 
-For example, if you want to integrate a new LLM model, add it to the configuration and modify the Agent class to support it.
+## Development Cycle
+1. **Requirement Analysis**: Manager Agent processes the requirements
+2. **Implementation**: Coding Agent writes the code
+3. **Code Review**: Review Agent analyzes the implementation
+4. **UI/UX Review**: UI/UX Agent evaluates the interface
+5. **Documentation**: Documentation Agent updates documentation
+6. **Testing**: Test Agent verifies functionality
+7. **Validation**: Browsing Agent checks the implementation
 
-Frontend Components (if applicable)
-Although this project does not include a frontend interface out of the box, it can easily be integrated with one. If you choose to implement a frontend, you can build a UI that allows users to:
+Each cycle creates backups and maintains versions of the implementation, allowing for iterative improvements.
 
-Select AI models and configure agents.
-Input tasks and view results.
-Monitor and manage task execution across multiple agents.
-Frontend Example (Optional)
-You can use modern frameworks like React or Vue.js to build an interface for the CrewAI framework. An example of a simple frontend interaction:
+## Extending the Framework
 
-A form for inputting tasks (description, type).
-A dashboard displaying agents and their current tasks.
-A results section showing completed task outputs.
-Error Handling
-The framework includes basic error handling in the execution process. When configuring new agents or tasks, ensure that appropriate exception handling is implemented to manage API failures, model errors, or timeouts.
+### Adding New Agents
+Extend the `AgentFactory` class in `agents.py` to add new specialized agents:
+```python
+agents['new_agent'] = Agent(
+    role="New Role",
+    goal="Specific Goal",
+    backstory="Agent Backstory",
+    llm=self.llm['default'],
+    allow_delegation=False,
+    verbose=True
+)
+```
 
-License
+### Custom Tools
+Create new tools in the `tools/` directory to add capabilities:
+```python
+class CustomTool(BaseTool):
+    def execute(self, *args, **kwargs):
+        # Tool implementation
+        pass
+```
+
+## License
 This project is licensed under the MIT License. See the LICENSE file for details.
