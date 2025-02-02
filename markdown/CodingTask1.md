@@ -1,0 +1,388 @@
+Start implementing the task bases on the existing feedback of manager, reviewer and desigener.  
+            Update the Current CODE implementation 
+            Output only the complete source code - nothing else.
+            
+            Use and always stick with the following requirements: 
+            
+            ### Requirement
+            Create a web page for a device management app. The page should maintain different devices in a web page.  The device management app should maintain the following data per device: ·        Device Name (String) ·        DeviceType (Allowed types: Smartphone, Tablet, Camera) ·        Owner Name (String) ·        Battery Status (0...100%) List existing devices of the app in a table. Add the possibility to create new devices with a screen to input the data. Your solution should be one HTML page with all components, styles and JavaScript code in this file.
+
+            
+            ### Reference implementation README.md:
+             
+            
+            ### Current implementation CODE:
+            ```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Device Management App</title>
+    <style>
+        /* Accessibility and Responsive Base Styles */
+        :root {
+            --primary-color: #2575fc;
+            --secondary-color: #6a11cb;
+            --text-color: #333;
+            --background-color: #f4f4f4;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Enhanced Accessibility Styles */
+        input, select, button {
+            min-height: 44px;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        /* Responsive Device Stats */
+        #deviceStats {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stats-card {
+            flex: 1;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            color: white;
+        }
+
+        #totalDevicesCard {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        }
+
+        #deviceTypesCard {
+            background: linear-gradient(135deg, #ff6a00 0%, #ee0979 100%);
+        }
+
+        #batteryStatusCard {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        /* Responsive Table */
+        #deviceTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        #deviceTable th, #deviceTable td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        /* Accessibility and Responsive Form */
+        #deviceForm {
+            display: grid;
+            gap: 15px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Battery Status Indicators */
+        .battery-status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .battery-status-critical { 
+            background-color: var(--danger-color);
+            color: white;
+        }
+        .battery-status-low { 
+            background-color: var(--warning-color);
+            color: black;
+        }
+        .battery-status-high { 
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        /* Responsive Design */
+        @media screen and (max-width: 768px) {
+            #deviceStats {
+                flex-direction: column;
+            }
+            
+            #deviceTable {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Device Management App</h1>
+
+    <!-- Accessibility-Enhanced Device Stats -->
+    <div id="deviceStats">
+        <div id="totalDevicesCard" class="stats-card">
+            <h4>Total Devices</h4>
+            <p><span id="totalDevices">0</span></p>
+        </div>
+        <div id="deviceTypesCard" class="stats-card">
+            <h4>Device Breakdown</h4>
+            <p>
+                Smartphones: <span id="smartphoneCount">0</span><br>
+                Tablets: <span id="tabletCount">0</span><br>
+                Cameras: <span id="cameraCount">0</span>
+            </p>
+        </div>
+        <div id="batteryStatusCard" class="stats-card">
+            <h4>Battery Health</h4>
+            <p>Average: <span id="averageBattery">0%</span></p>
+        </div>
+    </div>
+
+    <!-- Accessibility-Enhanced Device Input Form -->
+    <form id="deviceForm" aria-label="Add New Device">
+        <div>
+            <label for="deviceName">Device Name</label>
+            <input 
+                type="text" 
+                id="deviceName" 
+                name="deviceName" 
+                required 
+                minlength="2" 
+                maxlength="50"
+                aria-describedby="deviceNameHelp"
+            >
+            <small id="deviceNameHelp">2-50 characters</small>
+        </div>
+
+        <div>
+            <label for="deviceType">Device Type</label>
+            <select 
+                id="deviceType" 
+                name="deviceType" 
+                required
+                aria-describedby="deviceTypeHelp"
+            >
+                <option value="">Select Device Type</option>
+                <option value="Smartphone">Smartphone</option>
+                <option value="Tablet">Tablet</option>
+                <option value="Camera">Camera</option>
+            </select>
+            <small id="deviceTypeHelp">Choose a device type</small>
+        </div>
+
+        <div>
+            <label for="ownerName">Owner Name</label>
+            <input 
+                type="text" 
+                id="ownerName" 
+                name="ownerName" 
+                required 
+                minlength="2" 
+                maxlength="50"
+                aria-describedby="ownerNameHelp"
+            >
+            <small id="ownerNameHelp">2-50 characters</small>
+        </div>
+
+        <div>
+            <label for="batteryStatus">Battery Status (%)</label>
+            <input 
+                type="number" 
+                id="batteryStatus" 
+                name="batteryStatus" 
+                min="0" 
+                max="100" 
+                required
+                aria-describedby="batteryStatusHelp"
+            >
+            <small id="batteryStatusHelp">0-100 percentage</small>
+        </div>
+
+        <div>
+            <button type="submit" aria-label="Add Device">Add Device</button>
+            <button type="reset" aria-label="Clear Form">Clear Form</button>
+        </div>
+    </form>
+
+    <!-- Device List Table -->
+    <table id="deviceTable" aria-label="Device List">
+        <thead>
+            <tr>
+                <th>Device Name</th>
+                <th>Device Type</th>
+                <th>Owner Name</th>
+                <th>Battery Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="deviceList"></tbody>
+    </table>
+
+    <script>
+        class DeviceManager {
+            constructor() {
+                this.devices = JSON.parse(localStorage.getItem('devices') || '[]');
+                this.initEventListeners();
+                this.renderDevices();
+            }
+
+            initEventListeners() {
+                document.getElementById('deviceForm').addEventListener('submit', this.addDevice.bind(this));
+                document.getElementById('deviceForm').addEventListener('reset', this.resetForm.bind(this));
+            }
+
+            validateDevice(device) {
+                const errors = [];
+                
+                if (device.deviceName.trim().length < 2) {
+                    errors.push('Device name must be at least 2 characters');
+                }
+
+                if (device.ownerName.trim().length < 2) {
+                    errors.push('Owner name must be at least 2 characters');
+                }
+
+                if (device.batteryStatus < 0 || device.batteryStatus > 100) {
+                    errors.push('Battery status must be between 0 and 100');
+                }
+
+                const validTypes = ['Smartphone', 'Tablet', 'Camera'];
+                if (!validTypes.includes(device.deviceType)) {
+                    errors.push('Invalid device type');
+                }
+
+                return errors;
+            }
+
+            addDevice(event) {
+                event.preventDefault();
+                
+                const device = {
+                    deviceName: document.getElementById('deviceName').value,
+                    deviceType: document.getElementById('deviceType').value,
+                    ownerName: document.getElementById('ownerName').value,
+                    batteryStatus: parseInt(document.getElementById('batteryStatus').value),
+                    timestamp: new Date().toISOString()
+                };
+
+                const validationErrors = this.validateDevice(device);
+                
+                if (validationErrors.length > 0) {
+                    alert(validationErrors.join('\n'));
+                    return;
+                }
+
+                this.devices.push(device);
+                this.saveDevices();
+                this.renderDevices();
+                this.resetForm();
+            }
+
+            resetForm() {
+                document.getElementById('deviceForm').reset();
+            }
+
+            saveDevices() {
+                localStorage.setItem('devices', JSON.stringify(this.devices));
+            }
+
+            renderDevices() {
+                const deviceList = document.getElementById('deviceList');
+                deviceList.innerHTML = '';
+
+                this.devices.forEach((device, index) => {
+                    const row = deviceList.insertRow();
+                    row.innerHTML = `
+                        <td>${device.deviceName}</td>
+                        <td>${device.deviceType}</td>
+                        <td>${device.ownerName}</td>
+                        <td>
+                            <span class="battery-status ${this.getBatteryStatusClass(device.batteryStatus)}">
+                                ${device.batteryStatus}%
+                            </span>
+                        </td>
+                        <td>
+                            <button onclick="deviceManager.deleteDevice(${index})">Delete</button>
+                        </td>
+                    `;
+                });
+
+                this.updateDeviceStats();
+            }
+
+            deleteDevice(index) {
+                if (confirm('Are you sure you want to delete this device?')) {
+                    this.devices.splice(index, 1);
+                    this.saveDevices();
+                    this.renderDevices();
+                }
+            }
+
+            updateDeviceStats() {
+                const totalDevices = this.devices.length;
+                const smartphoneCount = this.devices.filter(d => d.deviceType === 'Smartphone').length;
+                const tabletCount = this.devices.filter(d => d.deviceType === 'Tablet').length;
+                const cameraCount = this.devices.filter(d => d.deviceType === 'Camera').length;
+                const averageBattery = totalDevices 
+                    ? Math.round(this.devices.reduce((sum, d) => sum + d.batteryStatus, 0) / totalDevices) 
+                    : 0;
+
+                document.getElementById('totalDevices').textContent = totalDevices;
+                document.getElementById('smartphoneCount').textContent = smartphoneCount;
+                document.getElementById('tabletCount').textContent = tabletCount;
+                document.getElementById('cameraCount').textContent = cameraCount;
+                document.getElementById('averageBattery').textContent = `${averageBattery}%`;
+            }
+
+            getBatteryStatusClass(batteryPercentage) {
+                if (batteryPercentage <= 30) return 'battery-status-critical';
+                if (batteryPercentage <= 69) return 'battery-status-low';
+                return 'battery-status-high';
+            }
+        }
+
+        const deviceManager = new DeviceManager();
+    </script>
+</body>
+</html>
+```
+            
+            
+            ### Code Review:
+            
+
+            ### Code Review:
+            
+
+            ### Design UI/UX Review:
+            
+
+            ### Browsing the page review:
+            
+            
