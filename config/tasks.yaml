@@ -1,0 +1,88 @@
+research_task:
+  description: >
+    Conduct a thorough research about {topic}
+    Make sure you find any interesting and relevant information given
+    the current year is 2024.
+  expected_output: >
+    A list with 10 bullet points of the most relevant information about {topic}
+  agent: researcher
+
+reporting_task:
+  description: >
+    Review the context you got and expand each topic into a full section for a report.
+    Make sure the report is detailed and contains any and all relevant information.
+  expected_output: >
+    A fully fledge reports with the mains topics, each with a full section of information.
+    Formatted as markdown without '```'
+  agent: reporting_analyst
+
+management_task:
+  description: >
+    Review the requirements and current implementation status. Create new tasks for
+    features that are not yet implemented. Guide the development process by breaking
+    down complex requirements into manageable steps.
+  expected_output: >
+    A list of prioritized tasks with clear implementation steps and requirements
+    for each unimplemented feature.
+  agent: manager
+
+coding_task:
+  description: >
+    Implement the assigned task from the manager by creating or modifying the HTML
+    web page with all required components. Provide complete, working code without
+    placeholders or references to external code.
+  expected_output: >
+    Complete source code for the web page including all HTML, JavaScript, and CSS
+    implementations.
+  agent: codeing_agent
+
+designer_task:
+  description: >
+    Review the implemented code and provide suggestions for improving the design,
+    layout, usability, and overall user experience of the frontend.
+  expected_output: >
+    A detailed suggestion for UI/UX improvement focusing on design, layout,
+    usability, or look & feel aspects.
+  agent: uiux_agent
+
+documentation_task:
+  description: >
+    Create technical documentation for the software focusing on user functionality
+    and frontend component usage. Document the features and how to use them.
+  expected_output: >
+    A comprehensive Readme.md file containing technical documentation about
+    software features and frontend component usage.
+  agent: documentation_agent
+
+test_task:
+  description: >
+    Review the implementation against requirements and document the test results.
+    Verify each requirement and confirm its implementation status.
+  expected_output: >
+    A test.md file containing a list of all checked requirements and their
+    implementation status confirmation.
+  agent: test_agent
+
+browsing_task:
+  description: >
+    Open in the browser: 'file:////home/com2u/projects/CrewAIFramework2/public/index.html'.  
+    Enter the data for a new device with the following data: Device Name = SamsungS8, DeviceType = Smartphone, Owner Name = Klaus, Battery Status = 55% and add it to the device list. 
+    Check the functionality and Report if it was workor or if you observed an error
+    {"go_to_url":{"url":"file:////home/com2u/projects/CrewAIFramework2/public/index.html"}},
+    Navigating to "file:////home/com2u/projects/CrewAIFramework2/public/index.html"!
+    Even in case on an error stay on the page navigating to "file:////home/com2u/projects/CrewAIFramework2/public/index.html" and report the error.
+    Even your next goal or action is always on the same page!
+  expected_output: >
+    A detailed report of the page analysis including any interactive elements,
+    content findings, or encountered errors.
+  agent: browsing_agent
+
+review_task:
+  description: >
+    Do a proper code review from the coding agent results and share your suggestion
+    to improve the code. Focus on code quality, coding style, architecture, naming,
+    and error handling.
+  expected_output: >
+    A detailed suggestion to improve the code in markdown format, focusing on making
+    the code more stable, robust, or professional.
+  agent: codereview_agent
