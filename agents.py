@@ -1,7 +1,7 @@
 import os
 import yaml
 from crewai import Agent, LLM
-from helper_tools import BrowsingTool
+from tools.helper_tools import BrowsingTool
 from typing import Dict
 
 class AgentFactory:
@@ -32,7 +32,7 @@ class AgentFactory:
     def _setup_llm(self) -> Dict[str, LLM]:
         """Setup LLM configurations."""
         llm = LLM(
-            model="openrouter/anthropic/claude-3.5-haiku",
+            model="openrouter/anthropic/claude-3.5-sonnet",
             temperature=0,
             base_url="https://openrouter.ai/api/v1",
             api_key=os.getenv("OPENROUTER_API_KEY")

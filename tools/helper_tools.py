@@ -57,7 +57,7 @@ async def _select_dropdown_by_xpath(xpath: str, option_value: str, browser):
     except Exception as e:
         raise Exception(f'Failed to select dropdown with xpath {xpath}. Error: {str(e)}')
 
-@controller.action('Select dropdowns', param_model=SelectDropdownAction, requires_browser=True)
+@controller.action('Select dropdowns', param_model=SelectDropdownAction)
 async def select_dropdown(params: SelectDropdownAction, browser: Browser):
     session = await browser.get_session()
     state = session.cached_state
