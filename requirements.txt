@@ -1,4 +1,4 @@
-browser-use==0.1.29
+browser-use==0.1.40
 crewai==0.98.0
 langchain-community==0.3.15
 langchain-openai==0.3.1
